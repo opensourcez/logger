@@ -22,57 +22,89 @@ func TestNewError(t *testing.T) {
 }
 
 func TestCloudShipping(t *testing.T) {
-	client := LoggingClient{}
+	client := Client{}
 	err := client.InitCloudLogger(&LoggingConfig{
 		ProjectID:      "heroic-truck-168212",
 		DefaultLogName: "general",
 		Logs:           []string{"transaction", "error", "activity"},
+		WithTrace:      true,
+		TraceAsJSON:    true,
+		SimpleTrace:    false,
+		Debug:          true,
 	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	newError := BadEmailOrPassword(nil)
-	newError.Operation = Operation{
-		Producer: "Transaction Controller",
-		ID:       "current-transaction",
+	op := &Operation{
+		Producer: "GET: /some/path/to/awesomeness",
+		ID:       "123123jb123b12",
 		First:    true,
 		Last:     false,
 	}
+	labels := make(map[string]string)
+	labels["CUSTOMER"] = "Google"
+	labels["SHORTCODE"] = "Goo"
+	labels["PATH"] = "/some/path/to/awesomeness"
+	labels["RANDOM"] = "whatDoYouNeedHere?"
 
-	newError.Labels = make(map[string]string)
-	newError.Labels["CUSTOMER"] = "ISB"
-	newError.Labels["STUFF"] = "isgreat"
+	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
+	newError.Operation = op
+	newError.Labels = labels
 
 	LogERROR(*newError, "transaction")
+
+	newError2 := BadEmailOrPassword(nil)
+	op.First = false
+	op.Last = true
+	newError2.Operation = op
+	newError2.Labels = labels
+
+	LogERROR(*newError2, "transaction")
 	time.Sleep(time.Second * 5)
 
 }
 
 func TestStdOutShipping(t *testing.T) {
-	client := LoggingClient{}
+	client := Client{}
 	err := client.InitStdOutLogger(&LoggingConfig{
 		DefaultLogName: "general",
+		WithTrace:      true,
+		TraceAsJSON:    false,
+		SimpleTrace:    true,
+		Debug:          true,
 	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	newError := BadEmailOrPassword(nil)
-	newError.Operation = Operation{
-		Producer: "Transaction Controller",
-		ID:       "current-transaction",
+	op := &Operation{
+		Producer: "GET: /some/path/to/awesomeness",
+		ID:       "123123jb123b12",
 		First:    true,
 		Last:     false,
 	}
+	labels := make(map[string]string)
+	labels["CUSTOMER"] = "Google"
+	labels["SHORTCODE"] = "Goo"
+	labels["PATH"] = "/some/path/to/awesomeness"
+	labels["RANDOM"] = "whatDoYouNeedHere?"
 
-	newError.Labels = make(map[string]string)
-	newError.Labels["CUSTOMER"] = "ISB"
-	newError.Labels["STUFF"] = "isgreat"
+	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
+	newError.Operation = op
+	newError.Labels = labels
 
-	LogERROR(*newError, "transaction")
+	LogERROR(*newError, "my-custom-log-tag")
+
+	newError2 := BadEmailOrPassword(nil)
+	op.First = false
+	op.Last = true
+	newError2.Operation = op
+	newError2.Labels = labels
+
+	LogERROR(*newError2, "my-custom-log-tag")
 	//time.Sleep(time.Second * 10)
 
 }

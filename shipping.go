@@ -3,6 +3,7 @@ package loggernew
 import (
 	"fmt"
 	"log"
+	"runtime/debug"
 	"time"
 
 	"cloud.google.com/go/logging"
@@ -28,36 +29,60 @@ func LogWARNING(construct InformationConstruct, logName string) {
 func LogNOTICE(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Notice)
 }
+func LogINFO(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Info)
+}
 
 func logLevel(construct InformationConstruct, logName string, severity logging.Severity) {
 	checkLogName(&logName)
+	var stackTrace string
+	var err error
+
+	if LogClient.Config.WithTrace {
+		if LogClient.Config.TraceAsJSON {
+			if LogClient.Config.SimpleTrace {
+				stackTrace, err = GetSimpleStackAsJSON()
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				stackTrace = string(debug.Stack())
+			}
+
+		} else {
+			if LogClient.Config.SimpleTrace {
+				stackTrace = GetSimpleStack()
+			} else {
+				stackTrace = string(debug.Stack())
+			}
+		}
+	}
+	construct.StackTrace = stackTrace
 
 	if !shipToCloud(logName) {
-		construct.Print(logName, severity)
+		construct.print(logName, severity)
 		return
 	}
 
 	labels := construct.Labels
 	operation := construct.Operation
 	cleanInformationConstruct(&construct)
-	sendToGoogleCloud(construct, operation, labels, severity, logName)
+	sendToGoogleCloud(construct, *operation, labels, severity, logName)
 }
 
 func cleanInformationConstruct(str *InformationConstruct) {
-	var nilStuff Operation
-	str.Operation = nilStuff
+	str.Operation = nil
 	str.Labels = nil
 }
 
 func checkLogName(logName *string) {
 	if *logName == "" {
-		*logName = Client.Config.DefaultLogName
+		*logName = LogClient.Config.DefaultLogName
 	}
 }
 
 func sendToGoogleCloud(construct interface{}, op Operation, labels map[string]string, severity logging.Severity, logName string) {
-	log.Println(Client.Loggers[logName])
-	Client.Loggers[logName].Log(logging.Entry{
+	LogClient.Loggers[logName].Log(logging.Entry{
 		InsertID: uuid.New().String(),
 		//InsertID:  "sadasdasd",
 		Timestamp: time.Now(),
@@ -72,13 +97,18 @@ func sendToGoogleCloud(construct interface{}, op Operation, labels map[string]st
 		}})
 }
 
-func (e *InformationConstruct) Print(logName string, severity logging.Severity) {
-	infoJSON := e.JSON()
-	fmt.Println(severity.String(), logName, infoJSON)
+func (e *InformationConstruct) print(logName string, severity logging.Severity) {
+	if LogClient.Config.Debug {
+		fmt.Println("========= DEBUG STACK ==========")
+		fmt.Println(e.StackTrace)
+		fmt.Println("================================")
+		e.StackTrace = ""
+	}
+	log.Println(severity.String(), logName, e.JSON())
 }
 
 func shipToCloud(logName string) bool {
-	for i := range Client.Loggers {
+	for i := range LogClient.Loggers {
 		if i == logName {
 			return true
 		}

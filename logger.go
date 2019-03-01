@@ -9,16 +9,13 @@ import (
 	"cloud.google.com/go/logging"
 )
 
-var Client *LoggingClient
+var LogClient *Client
 
 func NewObject(message string, HTTPCode int) InformationConstruct {
 	return InformationConstruct{
-		BaseConstruct: BaseConstruct{
-			Message:   message,
-			HTTPCode:  HTTPCode,
-			Code:      "0",
-			Timestamp: int32(time.Now().Unix()),
-		},
+		Message:        message,
+		HTTPCode:       HTTPCode,
+		Timestamp:      int32(time.Now().Unix()),
 		Hint:           "",
 		Temporary:      false,
 		Retries:        0,
@@ -30,7 +27,7 @@ func NewObject(message string, HTTPCode int) InformationConstruct {
 
 // InitCloudLogger ...
 // This method gives you a new logging client
-func (lc *LoggingClient) InitCloudLogger(config *LoggingConfig) (err error) {
+func (lc *Client) InitCloudLogger(config *LoggingConfig) (err error) {
 
 	if config.ProjectID == "" {
 		return NewObject("You need to set a projectID", 0)
@@ -57,13 +54,13 @@ func (lc *LoggingClient) InitCloudLogger(config *LoggingConfig) (err error) {
 
 	// set the global
 	// TODO: do we even need this ?
-	Client = lc
+	LogClient = lc
 	return
 }
 
 // InitStdOutLogger ...
 // This method gives you a new logging client
-func (lc *LoggingClient) InitStdOutLogger(config *LoggingConfig) (err error) {
+func (lc *Client) InitStdOutLogger(config *LoggingConfig) (err error) {
 	if config.DefaultLogName == "" {
 		return NewObject("You need to set a default log name", 0)
 	}
@@ -72,13 +69,13 @@ func (lc *LoggingClient) InitStdOutLogger(config *LoggingConfig) (err error) {
 
 	// set the global
 	// TODO: do we even need this ?
-	Client = lc
+	LogClient = lc
 	return
 }
 
 // AddLogger ...
 // Starts a new logger to a specific log file
-func (lc *LoggingClient) AddLogger(logName string) {
+func (lc *Client) AddLogger(logName string) {
 	lc.Loggers[logName] = lc.Client.Logger(logName)
 }
 
@@ -106,6 +103,6 @@ func GetHTTPCode(err error) int {
 	return 0
 }
 
-func (c *LoggingClient) Close() {
-	c.Client.Close()
+func (c *Client) Close() error {
+	return c.Client.Close()
 }
