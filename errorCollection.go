@@ -1,7 +1,7 @@
 package loggernew
 
 const (
-	// examples, we need NewError codes.
+	// examples, we need NewObject codes.
 	CodeTransactionCanceled = 1003
 	CodeTransactionFailed   = 1002
 	CodeTransactionSuccess  = 1001
@@ -41,167 +41,167 @@ const (
 	MessageDatabaseConnectionErrror    = "Could not connect to database"
 )
 
-func BadRequest(original error, message string) *ErrorConstruct {
-	error := NewError(message, HTTPCodeBadRequest)
+func BadRequest(original error, message string) *InformationConstruct {
+	error := NewObject(message, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
 
-func MissingCookie(original error) *ErrorConstruct {
-	error := NewError(MessageMissingCookie, HTTPCodeUnAuthorized)
+func MissingCookie(original error) *InformationConstruct {
+	error := NewObject(MessageMissingCookie, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
 
-func MissingJWTHeader(original error) *ErrorConstruct {
-	error := NewError(MessageMissingJWTHeader, HTTPCodeUnAuthorized)
+func MissingJWTHeader(original error) *InformationConstruct {
+	error := NewObject(MessageMissingJWTHeader, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
 
-func CouldNotGeneratePassword(original error) *ErrorConstruct {
-	error := NewError(MessageCouldNotGeneratePassword, HTTPCodeBadRequest)
+func CouldNotGeneratePassword(original error) *InformationConstruct {
+	error := NewObject(MessageCouldNotGeneratePassword, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func RouteNotFound(original error) *ErrorConstruct {
-	error := NewError(MessageRouteNotFound, HTTPCodeNotFound)
+func RouteNotFound(original error) *InformationConstruct {
+	error := NewObject(MessageRouteNotFound, HTTPCodeNotFound)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func InvalidUniqueIdentifier(original error) *ErrorConstruct {
-	error := NewError(MessageInvalidUniqueIdentifier, HTTPCodeBadRequest)
+func InvalidUniqueIdentifier(original error) *InformationConstruct {
+	error := NewObject(MessageInvalidUniqueIdentifier, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func RecordNotFound404(original error) *ErrorConstruct {
-	error := NewError(MessageRecordNotFound404, HTTPCodeNotFound)
+func RecordNotFound404(original error) *InformationConstruct {
+	error := NewObject(MessageRecordNotFound404, HTTPCodeNotFound)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func RecordNotFound(original error) *ErrorConstruct {
-	error := NewError("", HTTPCodeNoContent)
+func RecordNotFound(original error) *InformationConstruct {
+	error := NewObject("", HTTPCodeNoContent)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func BadEmailOrPassword(original error) *ErrorConstruct {
-	error := NewError(MessageBadEmailOrPassword, HTTPCodeUnAuthorized)
+func BadEmailOrPassword(original error) *InformationConstruct {
+	error := NewObject(MessageBadEmailOrPassword, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func Unauthorized(original error) *ErrorConstruct {
-	error := NewError(MessageUnauthorized, HTTPCodeUnAuthorized)
+func Unauthorized(original error) *InformationConstruct {
+	error := NewObject(MessageUnauthorized, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func LoginExpired(original error) *ErrorConstruct {
-	error := NewError(MessageLoginExpired, HTTPCodeLoginExpired)
+func LoginExpired(original error) *InformationConstruct {
+	error := NewObject(MessageLoginExpired, HTTPCodeLoginExpired)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func UnauthorizedCustomMessage(original error, message string) *ErrorConstruct {
-	error := NewError(message, HTTPCodeUnAuthorized)
+func UnauthorizedCustomMessage(original error, message string) *InformationConstruct {
+	error := NewObject(message, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func DisabledUser(original error) *ErrorConstruct {
-	error := NewError(MessageDisabledUser, HTTPCodeUnAuthorized)
+func DisabledUser(original error) *InformationConstruct {
+	error := NewObject(MessageDisabledUser, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func TooManyPasswordResetAttemps(original error) *ErrorConstruct {
-	error := NewError(MessageTooManyPasswordResetAttemps, HTTPCodeUnAuthorized)
+func TooManyPasswordResetAttemps(original error) *InformationConstruct {
+	error := NewObject(MessageTooManyPasswordResetAttemps, HTTPCodeUnAuthorized)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func ListNotAccepted(original error) *ErrorConstruct {
-	error := NewError(MessageListNotAccepted, HTTPCodeBadRequest)
+func ListNotAccepted(original error) *InformationConstruct {
+	error := NewObject(MessageListNotAccepted, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func GeneralDecoding(original error) *ErrorConstruct {
-	error := NewError(MessageGeneralDecoding, HTTPCodeBadRequest)
+func GeneralDecoding(original error) *InformationConstruct {
+	error := NewObject(MessageGeneralDecoding, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func JSONDecoding(original error) *ErrorConstruct {
-	error := NewError(MessageJSONDecoding, HTTPCodeBadRequest)
+func JSONDecoding(original error) *InformationConstruct {
+	error := NewObject(MessageJSONDecoding, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func XMLDecoding(original error) *ErrorConstruct {
-	error := NewError(MessageXMLDecoding, HTTPCodeBadRequest)
+func XMLDecoding(original error) *InformationConstruct {
+	error := NewObject(MessageXMLDecoding, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func JSONEncoding(original error) *ErrorConstruct {
-	error := NewError(MessageJSONEncoding, HTTPCodeInternalServerError)
+func JSONEncoding(original error) *InformationConstruct {
+	error := NewObject(MessageJSONEncoding, HTTPCodeInternalServerError)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func GenericEncoding(original error) *ErrorConstruct {
-	error := NewError(MessageGenericEncoding, HTTPCodeInternalServerError)
+func GenericEncoding(original error) *InformationConstruct {
+	error := NewObject(MessageGenericEncoding, HTTPCodeInternalServerError)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func XMLEncoding(original error) *ErrorConstruct {
-	error := NewError(MessageXMLEncoding, HTTPCodeInternalServerError)
+func XMLEncoding(original error) *InformationConstruct {
+	error := NewObject(MessageXMLEncoding, HTTPCodeInternalServerError)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func GenericError(original error) *ErrorConstruct {
-	error := NewError("", HTTPCodeInternalServerError)
+func GenericError(original error) *InformationConstruct {
+	error := NewObject("", HTTPCodeInternalServerError)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func GenericErrorWithMessage(original error, message string) *ErrorConstruct {
-	error := NewError(message, HTTPCodeInternalServerError)
+func GenericErrorWithMessage(original error, message string) *InformationConstruct {
+	error := NewObject(message, HTTPCodeInternalServerError)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func UnexpectedJWTSigningMethod(signingMethodInUse string) *ErrorConstruct {
-	error := NewError(MessageUnexpectedJWTSigningMethod+signingMethodInUse, HTTPCodeBadRequest)
+func UnexpectedJWTSigningMethod(signingMethodInUse string) *InformationConstruct {
+	error := NewObject(MessageUnexpectedJWTSigningMethod+signingMethodInUse, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = nil
 	return &error
 }
-func MissingPassword(original error) *ErrorConstruct {
-	error := NewError(MessageMissingPassword, HTTPCodeBadRequest)
+func MissingPassword(original error) *InformationConstruct {
+	error := NewObject(MessageMissingPassword, HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func UniqueKeyConstraint(original error) *ErrorConstruct {
-	error := NewError(original.Error(), HTTPCodeBadRequest)
+func UniqueKeyConstraint(original error) *InformationConstruct {
+	error := NewObject(original.Error(), HTTPCodeBadRequest)
 	error.ReturnToClient = true
 	error.OriginalError = original
 	return &error
 }
-func DatabaseConnectionErrror(original error) *ErrorConstruct {
-	error := NewError(MessageDatabaseConnectionErrror, HTTPCodeInternalServerError)
+func DatabaseConnectionErrror(original error) *InformationConstruct {
+	error := NewObject(MessageDatabaseConnectionErrror, HTTPCodeInternalServerError)
 	error.ReturnToClient = false
 	error.OriginalError = original
 	return &error

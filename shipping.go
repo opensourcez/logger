@@ -10,60 +10,43 @@ import (
 	logpb "google.golang.org/genproto/googleapis/logging/v2"
 )
 
-func LogERROR(construct ErrorConstruct, logName string) {
+func LogERROR(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Error)
 }
-func LogEMERGENCY(construct ErrorConstruct, logName string) {
+func LogEMERGENCY(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Emergency)
 }
-func LogCRITICAL(construct ErrorConstruct, logName string) {
+func LogCRITICAL(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Critical)
 }
-func LogALERT(construct ErrorConstruct, logName string) {
+func LogALERT(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Alert)
 }
-func LogWARNING(construct ErrorConstruct, logName string) {
+func LogWARNING(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Warning)
 }
-func LogNOTICE(construct ErrorConstruct, logName string) {
+func LogNOTICE(construct InformationConstruct, logName string) {
 	logLevel(construct, logName, logging.Notice)
 }
 
-func logLevel(construct ErrorConstruct, logName string, severity logging.Severity) {
+func logLevel(construct InformationConstruct, logName string, severity logging.Severity) {
 	checkLogName(&logName)
 
 	if !shipToCloud(logName) {
-		construct.Print(logName)
+		construct.Print(logName, severity)
 		return
 	}
 
 	labels := construct.Labels
 	operation := construct.Operation
-	cleanErrorConstruct(&construct)
+	cleanInformationConstruct(&construct)
 	sendToGoogleCloud(construct, operation, labels, severity, logName)
 }
 
-func cleanErrorConstruct(str *ErrorConstruct) {
+func cleanInformationConstruct(str *InformationConstruct) {
 	var nilStuff Operation
 	str.Operation = nilStuff
 	str.Labels = nil
-}
-
-func SendINFO(construct InformationConstruct, logName string) {
-	checkLogName(&logName)
-
-	if !shipToCloud(logName) {
-		construct.Print(logName)
-		return
-	}
-
-	var nilStuff Operation
-	labels := construct.Labels
-	operation := construct.Operation
-	construct.Operation = nilStuff
-	construct.Labels = nil
-	sendToGoogleCloud(construct, operation, labels, logging.Info, logName)
-
 }
 
 func checkLogName(logName *string) {
@@ -89,14 +72,9 @@ func sendToGoogleCloud(construct interface{}, op Operation, labels map[string]st
 		}})
 }
 
-func (e *InformationConstruct) Print(logName string) {
+func (e *InformationConstruct) Print(logName string, severity logging.Severity) {
 	infoJSON := e.JSON()
-	fmt.Println(infoJSON)
-}
-
-func (e *ErrorConstruct) Print(logName string) {
-	infoJSON := e.Error()
-	fmt.Println(infoJSON)
+	fmt.Println(severity.String(), logName, infoJSON)
 }
 
 func shipToCloud(logName string) bool {

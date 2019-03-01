@@ -10,11 +10,11 @@ import (
 	pg "github.com/lib/pq"
 )
 
-func GetDBError(err error) *ErrorConstruct {
+func GetDBError(err error) *InformationConstruct {
 	return ParsePGError(err.(*pg.Error))
 }
 
-func ParsePGError(err *pg.Error) (outError *ErrorConstruct) {
+func ParsePGError(err *pg.Error) (outError *InformationConstruct) {
 	switch err.Code {
 	case "42703": // Column not found error
 		outError = BadRequest(err, err.Routine)
