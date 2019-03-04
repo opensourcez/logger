@@ -111,13 +111,13 @@ func functionOne() {
 
 	LogERROR(*newError, "my-custom-log-tag")
 
-	newError2 := BadEmailOrPassword(nil)
-	op.First = false
-	op.Last = true
-	newError2.Operation = op
-	newError2.Labels = labels
+	//newError2 := BadEmailOrPassword(nil)
+	//op.First = false
+	//op.Last = true
+	//newError2.Operation = op
+	//newError2.Labels = labels
 
-	LogERROR(*newError2, "my-custom-log-tag2")
+	//LogERROR(*newError2, "my-custom-log-tag2")
 
 	// redirect stdout to file?
 	// read file and compare..

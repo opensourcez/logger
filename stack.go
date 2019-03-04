@@ -8,37 +8,31 @@ import (
 
 func GetSimpleStack(asJSON bool) (string, error) {
 	stackSplit := strings.Split(string(debug.Stack()), "\n")
-	var filesAndLines []string
-
-	for i, v := range stackSplit {
-		if i == 0 {
-			continue
-		}
-		if (i % 2) == 0 {
-			fileAndLine := strings.Split(v, ":")
-			final := fileAndLine[len(fileAndLine)-1 : len(fileAndLine)][0]
-			filesAndLines = append(filesAndLines, final)
-		}
-	}
-
 	var stackTrace []string
 	count := 0
+
+	var currentLine string
 	for i, v := range stackSplit {
-		if (i % 2) == 1 {
-			var line string
-			if count < len(filesAndLines) {
-				line = strings.Split(filesAndLines[count], " ")[0]
-			} else {
+		if (i % 2) == 0 {
+			lineNumberIndex := i + 2
+			if lineNumberIndex > len(stackSplit)-1 {
 				continue
 			}
+			currentLine = strings.Split(strings.Split(stackSplit[lineNumberIndex], ":")[1], " ")[0]
+		}
+
+		if (i % 2) == 1 {
 			splitFunc := strings.Split(v, "(")
-			stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"():"+line)
+			if len(splitFunc) <= 1 {
+				continue
+			}
+			stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"():"+currentLine)
 			count++
 		}
 	}
 
 	var finalStack string
-	stackTrace = append(stackTrace[:0], stackTrace[0+5:]...)
+	stackTrace = append(stackTrace[:0], stackTrace[0+6:]...)
 	if asJSON {
 		jsonSTACK, err := json.Marshal(stackTrace)
 		if err != nil {
