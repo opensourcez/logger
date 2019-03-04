@@ -32,9 +32,7 @@ func GetSimpleStack(asJSON bool) (string, error) {
 				continue
 			}
 			splitFunc := strings.Split(v, "(")
-			firstLine := splitFunc[0]
-			secondLine := strings.Split(splitFunc[1], ")")[1]
-			stackTrace = append(stackTrace, firstLine+secondLine+"():"+line)
+			stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"():"+line)
 			count++
 		}
 
@@ -79,7 +77,6 @@ func getStack() (stacktrace string, err error) {
 		}
 		stacktrace = string(debug.Stack())
 		return
-
 	}
 
 	// no trace
