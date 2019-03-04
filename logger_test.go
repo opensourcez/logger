@@ -22,15 +22,16 @@ func TestNewError(t *testing.T) {
 }
 
 func TestCloudShipping(t *testing.T) {
-	client := Client{}
-	err := client.InitCloudLogger(&LoggingConfig{
-		ProjectID:      "heroic-truck-168212",
-		DefaultLogName: "general",
-		Logs:           []string{"transaction", "error", "activity"},
-		WithTrace:      true,
-		TraceAsJSON:    true,
-		SimpleTrace:    false,
-		Debug:          true,
+	client := Logger{}
+	err := client.Init(&LoggingConfig{
+		ProjectID:     "heroic-truck-168212",
+		DefaultLogTag: "general",
+		Logs:          []string{"transaction", "error", "activity"},
+		WithTrace:     true,
+		TraceAsJSON:   true,
+		SimpleTrace:   false,
+		Debug:         true,
+		Type:          "google",
 	})
 
 	if err != nil {
@@ -78,13 +79,14 @@ func functionTwo() {
 	functionOne()
 }
 func functionOne() {
-	client := Client{}
-	err := client.InitStdOutLogger(&LoggingConfig{
-		DefaultLogName: "general",
-		WithTrace:      true,
-		TraceAsJSON:    false,
-		SimpleTrace:    true,
-		Debug:          true,
+	client := Logger{}
+	err := client.Init(&LoggingConfig{
+		DefaultLogTag: "general",
+		WithTrace:     true,
+		TraceAsJSON:   false,
+		SimpleTrace:   true,
+		Debug:         true,
+		Type:          "stdout",
 	})
 
 	if err != nil {

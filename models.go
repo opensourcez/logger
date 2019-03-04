@@ -1,9 +1,35 @@
 package loggernew
 
-import (
-	"cloud.google.com/go/logging"
-)
+import gclogging "cloud.google.com/go/logging"
 
+// Logger ...
+// The base logging struct
+type Logger struct {
+	Config *LoggingConfig
+	Client LoggingClient
+}
+
+// LoggingClient ...
+type LoggingClient interface {
+	new(config *LoggingConfig) error
+	log(object *InformationConstruct, severity string, logTag string)
+	close()
+}
+
+// GoogleClient ...
+type GoogleClient struct {
+	Loggers map[string]*gclogging.Logger
+	Config  *LoggingConfig
+	Client  *gclogging.Client
+}
+
+// StdClient ...
+type StdClient struct {
+	Loggers map[string]string
+	Config  *LoggingConfig
+}
+
+// InformationConstruct ...
 type InformationConstruct struct {
 	Operation      *Operation        `json:"Operation,omitempty" xml:"Operation"`
 	Labels         map[string]string `json:"Labels,omitempty" xml:"Labels"`
@@ -20,24 +46,19 @@ type InformationConstruct struct {
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
 }
 
-// Client ...
-// A logging client for Google Cloud
-type Client struct {
-	Client  *logging.Client
-	Loggers map[string]*logging.Logger
-	Config  *LoggingConfig
-}
-
+// LoggingConfig ...
 type LoggingConfig struct {
-	ProjectID      string
-	DefaultLogName string
-	Logs           []string
-	WithTrace      bool
-	TraceAsJSON    bool
-	SimpleTrace    bool
-	Debug          bool
+	ProjectID     string
+	DefaultLogTag string
+	Logs          []string
+	WithTrace     bool
+	TraceAsJSON   bool
+	SimpleTrace   bool
+	Debug         bool
+	Type          string // google, aws?, stdout, file?
 }
 
+// Operation ...
 type Operation struct {
 	ID       string `json:"ID,omitempty" xml:"ID"`
 	Producer string `json:"Producer,omitempty" xml:"Producer"`

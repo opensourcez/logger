@@ -1,134 +1,70 @@
 package loggernew
 
 import (
-	"fmt"
-	"log"
-	"runtime/debug"
-	"time"
-
-	"cloud.google.com/go/logging"
-	"github.com/google/uuid"
-	logpb "google.golang.org/genproto/googleapis/logging/v2"
+	"encoding/json"
+	"reflect"
 )
-
-func logLevel(construct InformationConstruct, logName string, severity logging.Severity) {
-	// make sure we have a log name
-	checkLogName(&logName)
-
-	// set the stack trace
-	stacktrace, err := getStack()
-	if err != nil {
-		log.Println(err) // handle this better
-	}
-	if stacktrace != "" {
-		construct.StackTrace = stacktrace
-	}
-
-	// if we do not ship to cloud we just print
-	if !shipToCloud(logName) {
-		construct.print(logName, severity)
-		return
-	}
-
-	// deconstruct labels and op from the construct
-	labels := construct.Labels
-	operation := construct.Operation
-	// cleanup
-	cleanInformationConstruct(&construct)
-	// ship
-	sendToGoogleCloud(construct, *operation, labels, severity, logName)
-}
-
-func getStack() (stacktrace string, err error) {
-
-	if LogClient.Config.WithTrace {
-		if LogClient.Config.TraceAsJSON {
-			if LogClient.Config.SimpleTrace {
-				stacktrace, err = GetSimpleStackAsJSON()
-				if err != nil {
-					panic(err)
-				}
-			} else {
-				stacktrace = string(debug.Stack())
-			}
-
-		} else {
-			if LogClient.Config.SimpleTrace {
-				stacktrace = GetSimpleStack()
-			} else {
-				stacktrace = string(debug.Stack())
-			}
-		}
-	}
-
-	// no trace
-	return "", nil
-}
 
 func cleanInformationConstruct(str *InformationConstruct) {
 	str.Operation = nil
 	str.Labels = nil
 }
 
-func checkLogName(logName *string) {
-	if *logName == "" {
-		*logName = LogClient.Config.DefaultLogName
+func checklogTag(logTag *string) {
+	if *logTag == "" {
+		*logTag = logClient.Config.DefaultLogTag
 	}
 }
 
-func sendToGoogleCloud(construct interface{}, op Operation, labels map[string]string, severity logging.Severity, logName string) {
-	LogClient.Loggers[logName].Log(logging.Entry{
-		InsertID: uuid.New().String(),
-		//InsertID:  "sadasdasd",
-		Timestamp: time.Now(),
-		Labels:    labels,
-		Payload:   construct,
-		Severity:  severity,
-		Operation: &logpb.LogEntryOperation{
-			Id:       op.ID,
-			Producer: op.Producer,
-			First:    op.First,
-			Last:     op.Last,
-		}})
-}
-
-func (e *InformationConstruct) print(logName string, severity logging.Severity) {
-	if LogClient.Config.Debug {
-		fmt.Println("========= DEBUG STACK ==========")
-		fmt.Println(e.StackTrace)
-		fmt.Println("================================")
-		e.StackTrace = ""
+func (e InformationConstruct) Error() string {
+	outJSON, err := json.Marshal(e)
+	if err != nil {
+		return JSONEncoding(err).Error()
 	}
-	log.Println(severity.String(), logName, e.JSON())
+	return string(outJSON)
 }
 
-func shipToCloud(logName string) bool {
-	for i := range LogClient.Loggers {
-		if i == logName {
-			return true
-		}
+func (i InformationConstruct) JSON() string {
+	outJSON, err := json.Marshal(i)
+	if err != nil {
+		return JSONEncoding(err).Error()
 	}
-	return false
+	return string(outJSON)
 }
 
-func LogERROR(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Error)
+func GetHTTPCode(err error) int {
+	if reflect.TypeOf(err) == reflect.TypeOf(InformationConstruct{}) {
+		return err.(InformationConstruct).HTTPCode
+	}
+
+	return 0
 }
-func LogEMERGENCY(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Emergency)
+
+func LogERROR(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "ERROR")
 }
-func LogCRITICAL(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Critical)
+func LogEMERGENCY(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "EMERGENCY")
 }
-func LogALERT(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Alert)
+func LogCRITICAL(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "CRITICAL")
 }
-func LogWARNING(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Warning)
+func LogALERT(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "ALERT")
 }
-func LogNOTICE(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Notice)
+func LogWARNING(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "WARNING")
 }
-func LogINFO(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Info)
+func LogNOTICE(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "NOTICE")
+}
+func LogINFO(construct InformationConstruct, logTag string) {
+	logit(construct, logTag, "INFO")
+}
+
+func logit(construct InformationConstruct, logTag string, severity string) {
+	checklogTag(&logTag)
+	//log.Println(logClient.Client)
+	//panic("meow")
+	logClient.Client.log(&construct, severity, logTag)
 }
