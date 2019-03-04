@@ -47,7 +47,7 @@ func (lc *Client) InitCloudLogger(config *LoggingConfig) (err error) {
 	lc.Client = newClient
 
 	// Add loggers
-	lc.Loggers = make(map[string]*logging.Logger)
+	lc.Loggers = make(map[string]Logger)
 	for _, v := range lc.Config.Logs {
 		lc.AddLogger(v)
 	}

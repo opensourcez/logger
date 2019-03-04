@@ -11,63 +11,58 @@ import (
 	logpb "google.golang.org/genproto/googleapis/logging/v2"
 )
 
-func LogERROR(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Error)
-}
-func LogEMERGENCY(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Emergency)
-}
-func LogCRITICAL(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Critical)
-}
-func LogALERT(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Alert)
-}
-func LogWARNING(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Warning)
-}
-func LogNOTICE(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Notice)
-}
-func LogINFO(construct InformationConstruct, logName string) {
-	logLevel(construct, logName, logging.Info)
-}
-
 func logLevel(construct InformationConstruct, logName string, severity logging.Severity) {
+	// make sure we have a log name
 	checkLogName(&logName)
-	var stackTrace string
-	var err error
 
-	if LogClient.Config.WithTrace {
-		if LogClient.Config.TraceAsJSON {
-			if LogClient.Config.SimpleTrace {
-				stackTrace, err = GetSimpleStackAsJSON()
-				if err != nil {
-					panic(err)
-				}
-			} else {
-				stackTrace = string(debug.Stack())
-			}
-
-		} else {
-			if LogClient.Config.SimpleTrace {
-				stackTrace = GetSimpleStack()
-			} else {
-				stackTrace = string(debug.Stack())
-			}
-		}
+	// set the stack trace
+	stacktrace, err := getStack()
+	if err != nil {
+		log.Println(err) // handle this better
 	}
-	construct.StackTrace = stackTrace
+	if stacktrace != "" {
+		construct.StackTrace = stacktrace
+	}
 
+	// if we do not ship to cloud we just print
 	if !shipToCloud(logName) {
 		construct.print(logName, severity)
 		return
 	}
 
+	// deconstruct labels and op from the construct
 	labels := construct.Labels
 	operation := construct.Operation
+	// cleanup
 	cleanInformationConstruct(&construct)
+	// ship
 	sendToGoogleCloud(construct, *operation, labels, severity, logName)
+}
+
+func getStack() (stacktrace string, err error) {
+
+	if LogClient.Config.WithTrace {
+		if LogClient.Config.TraceAsJSON {
+			if LogClient.Config.SimpleTrace {
+				stacktrace, err = GetSimpleStackAsJSON()
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				stacktrace = string(debug.Stack())
+			}
+
+		} else {
+			if LogClient.Config.SimpleTrace {
+				stacktrace = GetSimpleStack()
+			} else {
+				stacktrace = string(debug.Stack())
+			}
+		}
+	}
+
+	// no trace
+	return "", nil
 }
 
 func cleanInformationConstruct(str *InformationConstruct) {
@@ -114,4 +109,26 @@ func shipToCloud(logName string) bool {
 		}
 	}
 	return false
+}
+
+func LogERROR(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Error)
+}
+func LogEMERGENCY(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Emergency)
+}
+func LogCRITICAL(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Critical)
+}
+func LogALERT(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Alert)
+}
+func LogWARNING(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Warning)
+}
+func LogNOTICE(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Notice)
+}
+func LogINFO(construct InformationConstruct, logName string) {
+	logLevel(construct, logName, logging.Info)
 }

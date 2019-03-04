@@ -67,6 +67,17 @@ func TestCloudShipping(t *testing.T) {
 }
 
 func TestStdOutShipping(t *testing.T) {
+
+	//time.Sleep(time.Second * 10)
+	functionThree()
+}
+func functionThree() {
+	functionTwo()
+}
+func functionTwo() {
+	functionOne()
+}
+func functionOne() {
 	client := Client{}
 	err := client.InitStdOutLogger(&LoggingConfig{
 		DefaultLogName: "general",
@@ -104,7 +115,9 @@ func TestStdOutShipping(t *testing.T) {
 	newError2.Operation = op
 	newError2.Labels = labels
 
-	LogERROR(*newError2, "my-custom-log-tag")
-	//time.Sleep(time.Second * 10)
+	LogERROR(*newError2, "my-custom-log-tag2")
 
+	// redirect stdout to file?
+	// read file and compare..
+	// delete file ..
 }
