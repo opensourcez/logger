@@ -35,7 +35,6 @@ func GetSimpleStack(asJSON bool) (string, error) {
 			stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"():"+line)
 			count++
 		}
-
 	}
 
 	var finalStack string
