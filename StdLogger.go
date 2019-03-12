@@ -3,6 +3,8 @@ package logger
 import (
 	"fmt"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 func (g *StdClient) new(config *LoggingConfig) (err error) {
@@ -36,10 +38,9 @@ func (g *StdClient) close() {
 func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
 	if debug {
 		if e.Operation != nil {
-			fmt.Println("============ ERROR =======\nOperation.ID:", e.Operation.ID, "\nMessage:", e.Message, "\n--------------------------\n"+e.StackTrace, "\n==========================")
-		} else {
-			fmt.Println("============ ERROR =======\nMessage:", e.Message, "\n--------------------------\n", e.StackTrace, "\n==========================")
+			e.Operation = &Operation{ID: uuid.New().String()}
 		}
+		fmt.Println("============ LOG =======\nOperation.ID:", e.Operation.ID, "\nMessage:", e.Message, "\n--------------------------\n"+e.StackTrace, "\n==========================")
 		e.StackTrace = ""
 	}
 
