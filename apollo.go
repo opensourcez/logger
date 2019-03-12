@@ -1,4 +1,4 @@
-package loggernew
+package logger
 
 // TODO: finish this
 func PrintAppoloVariables(vars map[string]interface{}) {

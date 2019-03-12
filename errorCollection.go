@@ -1,4 +1,4 @@
-package loggernew
+package logger
 
 const (
 	// examples, we need NewObject codes.

@@ -1,4 +1,4 @@
-package loggernew
+package logger
 
 import (
 	"log"
