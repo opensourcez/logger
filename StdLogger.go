@@ -37,7 +37,7 @@ func (g *StdClient) close() {
 
 func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
 	if debug {
-		if e.Operation != nil {
+		if e.Operation == nil {
 			e.Operation = &Operation{ID: uuid.New().String()}
 		}
 		fmt.Println("============ LOG =======\nOperation.ID:", e.Operation.ID, "\nMessage:", e.Message, "\n--------------------------\n"+e.StackTrace, "\n==========================")
