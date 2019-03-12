@@ -23,6 +23,11 @@ type GoogleClient struct {
 	Client  *gclogging.Client
 }
 
+// CrashGuardClient ...
+type CrashGuardClient struct {
+	Config *LoggingConfig
+}
+
 // StdClient ...
 type StdClient struct {
 	Loggers map[string]string

@@ -4,9 +4,6 @@ import (
 	"time"
 )
 
-// Global log client within the package
-var logClient *Logger
-
 // NewObject ...
 func NewObject(message string, HTTPCode int) InformationConstruct {
 	return InformationConstruct{
@@ -40,16 +37,19 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 
 	switch config.Type {
 	case "google":
-		logger := GoogleClient{}
-		err = logger.new(config)
-		l.Client = logger
-		logClient = l
+		client := GoogleClient{}
+		err = client.new(config)
+		l.Client = &client
+		break
+	case "crashguard":
+		client := CrashGuardClient{}
+		err = client.new(config)
+		l.Client = &client
 		break
 	case "stdout":
 		logger := StdClient{}
 		err = logger.new(config)
-		l.Client = logger
-		logClient = l
+		l.Client = &logger
 	case "aws":
 		panic("aws logger has not been implemented yet")
 	case "file":
@@ -57,8 +57,7 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 	default:
 		logger := StdClient{}
 		err = logger.new(config)
-		l.Client = logger
-		logClient = l
+		l.Client = &logger
 	}
 
 	return

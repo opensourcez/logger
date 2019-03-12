@@ -11,7 +11,7 @@ import (
 	logpb "google.golang.org/genproto/googleapis/logging/v2"
 )
 
-func (g GoogleClient) new(config *LoggingConfig) (err error) {
+func (g *GoogleClient) new(config *LoggingConfig) (err error) {
 
 	// Init the client
 	ctx := context.Background()
@@ -27,13 +27,26 @@ func (g GoogleClient) new(config *LoggingConfig) (err error) {
 
 	g.Client = newClient
 	g.Config = config
+	log.Println("client after init")
+	log.Println(g)
 	return nil
 }
 
-func (g GoogleClient) log(object *InformationConstruct, severity string, logTag string) {
+func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag string) {
 
+	defer func(object *InformationConstruct, severity string, logTag string) {
+		if r := recover(); r != nil {
+			if object.Operation != nil {
+				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
+			} else {
+				object.Operation = &Operation{ID: uuid.New().String()}
+				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
+			}
+			object.print(logTag, severity, g.Config.Debug)
+		}
+	}(object, severity, logTag)
 	// set the stack trace
-	stacktrace, err := getStack()
+	stacktrace, err := getStack(g.Config)
 	if err != nil {
 		log.Println(err) // handle this better
 	}
@@ -46,6 +59,7 @@ func (g GoogleClient) log(object *InformationConstruct, severity string, logTag 
 	op := object.Operation
 	// cleanup
 	cleanInformationConstruct(object)
+
 	// ship
 	g.Loggers[logTag].Log(logging.Entry{
 		InsertID: uuid.New().String(),
@@ -83,6 +97,6 @@ func getSeverity(severity string) logging.Severity {
 	}
 }
 
-func (g GoogleClient) close() {
+func (g *GoogleClient) close() {
 	g.Client.Close()
 }

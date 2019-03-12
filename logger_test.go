@@ -22,17 +22,19 @@ func TestNewError(t *testing.T) {
 }
 
 func TestCloudShipping(t *testing.T) {
-	client := Logger{}
-	err := client.Init(&LoggingConfig{
+	logger := Logger{}
+	err := logger.Init(&LoggingConfig{
 		ProjectID:     "heroic-truck-168212",
 		DefaultLogTag: "general",
 		Logs:          []string{"transaction", "error", "activity"},
 		WithTrace:     true,
-		TraceAsJSON:   true,
-		SimpleTrace:   false,
+		TraceAsJSON:   false,
+		SimpleTrace:   true,
 		Debug:         true,
 		Type:          "google",
 	})
+
+	//log.Println(logger)
 
 	if err != nil {
 		panic(err)
@@ -54,7 +56,7 @@ func TestCloudShipping(t *testing.T) {
 	newError.Operation = op
 	newError.Labels = labels
 
-	LogERROR(*newError, "transaction")
+	logger.ERROR(*newError, "transaction")
 
 	newError2 := BadEmailOrPassword(nil)
 	op.First = false
@@ -62,7 +64,7 @@ func TestCloudShipping(t *testing.T) {
 	newError2.Operation = op
 	newError2.Labels = labels
 
-	LogERROR(*newError2, "transaction")
+	logger.ERROR(*newError2, "transaction")
 	time.Sleep(time.Second * 5)
 
 }
@@ -70,17 +72,17 @@ func TestCloudShipping(t *testing.T) {
 func TestStdOutShipping(t *testing.T) {
 
 	//time.Sleep(time.Second * 10)
-	functionThree()
+	s3()
 }
-func functionThree() {
-	functionTwo()
+func s3() {
+	s2()
 }
-func functionTwo() {
-	functionOne()
+func s2() {
+	s1()
 }
-func functionOne() {
-	client := Logger{}
-	err := client.Init(&LoggingConfig{
+func s1() {
+	logger := Logger{}
+	err := logger.Init(&LoggingConfig{
 		DefaultLogTag: "general",
 		WithTrace:     true,
 		TraceAsJSON:   false,
@@ -94,7 +96,7 @@ func functionOne() {
 	}
 
 	op := &Operation{
-		Producer: "GET: /some/path/to/awesomeness",
+		Producer: "requestid or namespace or anything really..",
 		ID:       "123123jb123b12",
 		First:    true,
 		Last:     false,
@@ -109,7 +111,7 @@ func functionOne() {
 	newError.Operation = op
 	newError.Labels = labels
 
-	LogERROR(*newError, "my-custom-log-tag")
+	logger.ERROR(*newError, "my-custom-log-tag")
 
 	//newError2 := BadEmailOrPassword(nil)
 	//op.First = false

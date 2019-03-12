@@ -10,9 +10,9 @@ func cleanInformationConstruct(str *InformationConstruct) {
 	str.Labels = nil
 }
 
-func checklogTag(logTag *string) {
+func (l *Logger) checklogTag(logTag *string) {
 	if *logTag == "" {
-		*logTag = logClient.Config.DefaultLogTag
+		*logTag = l.Config.DefaultLogTag
 	}
 }
 
@@ -40,31 +40,29 @@ func GetHTTPCode(err error) int {
 	return 0
 }
 
-func LogERROR(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "ERROR")
+func (l *Logger) ERROR(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "ERROR")
 }
-func LogEMERGENCY(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "EMERGENCY")
+func (l *Logger) EMERGENCY(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "EMERGENCY")
 }
-func LogCRITICAL(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "CRITICAL")
+func (l *Logger) CRITICAL(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "CRITICAL")
 }
-func LogALERT(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "ALERT")
+func (l *Logger) ALERT(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "ALERT")
 }
-func LogWARNING(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "WARNING")
+func (l *Logger) WARNING(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "WARNING")
 }
-func LogNOTICE(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "NOTICE")
+func (l *Logger) NOTICE(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "NOTICE")
 }
-func LogINFO(construct InformationConstruct, logTag string) {
-	logit(construct, logTag, "INFO")
+func (l *Logger) INFO(construct InformationConstruct, logTag string) {
+	l.logit(construct, logTag, "INFO")
 }
 
-func logit(construct InformationConstruct, logTag string, severity string) {
-	checklogTag(&logTag)
-	//log.Println(logClient.Client)
-	//panic("meow")
-	logClient.Client.log(&construct, severity, logTag)
+func (l *Logger) logit(construct InformationConstruct, logTag string, severity string) {
+	l.checklogTag(&logTag)
+	l.Client.log(&construct, severity, logTag)
 }
