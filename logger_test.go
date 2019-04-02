@@ -73,6 +73,7 @@ func TestStdOutShipping(t *testing.T) {
 
 	//time.Sleep(time.Second * 10)
 	s3()
+	time.Sleep(time.Second * 5)
 }
 func s3() {
 	s2()
