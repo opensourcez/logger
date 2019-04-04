@@ -3,6 +3,7 @@ package logger
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -36,6 +37,7 @@ func (g *StdClient) close() {
 }
 
 func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
+	e.Query = strings.Replace(e.Query, "SQL", "", 1)
 	if debug {
 		if e.Operation == nil {
 			e.Operation = &Operation{ID: uuid.New().String()}
@@ -43,7 +45,8 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		fmt.Println("============ LOG =======\nOperation.ID:" +
 			e.Operation.ID +
 			"\nMessage:" +
-			e.Message + "\n" +
+			e.Message +
+			"\nQuery:" +
 			e.Query +
 			"\n--------------------------\n" +
 			e.StackTrace +
