@@ -40,8 +40,16 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		if e.Operation == nil {
 			e.Operation = &Operation{ID: uuid.New().String()}
 		}
-		fmt.Println("============ LOG =======\nOperation.ID:", e.Operation.ID, "\nMessage:", e.Message, "\n--------------------------\n"+e.StackTrace, "\n==========================")
+		fmt.Println("============ LOG =======\nOperation.ID:" +
+			e.Operation.ID +
+			"\nMessage:" +
+			e.Message +
+			e.Query +
+			"\n--------------------------\n" +
+			e.StackTrace +
+			"\n==========================")
 		e.StackTrace = ""
+		e.Query = ""
 	}
 
 	log.Println(severity, logTag, e.JSON())

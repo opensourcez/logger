@@ -49,6 +49,7 @@ type InformationConstruct struct {
 	OriginalError  error             `json:"-" xml:"-"`
 	Hint           string            `json:"Hint,omitempty" xml:"Hint"`
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
+	Query          string            `json:"Query,omitempty" xml:"Query"`
 }
 
 // LoggingConfig ...
