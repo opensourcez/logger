@@ -7,14 +7,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lib/pq"
+	pgx "github.com/lib/pq"
 )
 
 func GetDBError(err error) *InformationConstruct {
-	return ParsePGError(err.(*pg.Error))
+	return ParsePGError(err.(*pgx.Error))
 }
 
-func ParsePGError(err *pg.Error) (outError *InformationConstruct) {
+func ParsePGError(err *pgx.Error) (outError *InformationConstruct) {
 	switch err.Code {
 	case "42703": // Column not found error
 		outError = BadRequest(err, err.Routine)
