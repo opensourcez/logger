@@ -43,7 +43,7 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		fmt.Println("============ LOG =======\nOperation.ID:" +
 			e.Operation.ID +
 			"\nMessage:" +
-			e.Message +
+			e.Message + "\n" +
 			e.Query +
 			"\n--------------------------\n" +
 			e.StackTrace +
