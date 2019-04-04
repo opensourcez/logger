@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	pg "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func GetDBError(err error) *InformationConstruct {
