@@ -47,17 +47,17 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 		l.Client = &client
 		break
 	case "stdout":
-		logger := StdClient{}
-		err = logger.new(config)
-		l.Client = &logger
+		client := StdClient{}
+		err = client.new(config)
+		l.Client = &client
 	case "aws":
 		panic("aws logger has not been implemented yet")
 	case "file":
 		panic("file logger has not been implemented yet")
 	default:
-		logger := StdClient{}
-		err = logger.new(config)
-		l.Client = &logger
+		client := StdClient{}
+		err = client.new(config)
+		l.Client = &client
 	}
 
 	return

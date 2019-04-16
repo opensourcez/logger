@@ -1,6 +1,12 @@
 package logger
 
-import gclogging "cloud.google.com/go/logging"
+import (
+	"fmt"
+	"log"
+
+	gclogging "cloud.google.com/go/logging"
+	"github.com/google/uuid"
+)
 
 // Logger ...
 // The base logging struct
@@ -50,6 +56,35 @@ type InformationConstruct struct {
 	Hint           string            `json:"Hint,omitempty" xml:"Hint"`
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
 	Query          string            `json:"Query,omitempty" xml:"Query"`
+}
+
+func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
+
+	if debug {
+		// if we do not have an opperation we add one.
+		if e.Operation == nil {
+			e.Operation = &Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
+		}
+		logString := "============ LOG =======\nOperation.ID:" + e.Operation.ID + "\nMessage:" + e.Message
+
+		if e.Query != "" {
+			logString = logString + "\nQuery:" + e.Query
+		}
+
+		logString = logString + "\n--------------------------\n"
+
+		if e.StackTrace != "" {
+			logString = logString + e.StackTrace
+		}
+
+		logString = logString + "\n=========================="
+		fmt.Println(logString)
+		// remove trace and query from object when debugging
+		e.StackTrace = ""
+		e.Query = ""
+	}
+
+	log.Println(severity, logTag, e.JSON())
 }
 
 // LoggingConfig ...

@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: Finish crashguard implementation
 func (g *CrashGuardClient) new(config *LoggingConfig) (err error) {
 
 	g.Config = config
