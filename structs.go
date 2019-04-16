@@ -65,23 +65,22 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		if e.Operation == nil {
 			e.Operation = &Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
 		}
-		logString := "============ LOG =======\nOperationID: " + e.Operation.ID + "\nMessage: " + e.Message
+		logString := "============ DEBUG ENTRY =======\nOperationID: " + e.Operation.ID + "\nMessage: " + e.Message + "\n"
 
 		if e.Query != "" {
-			logString = logString + "\nQuery: " + e.Query
+			logString = logString + "Query: " + e.Query + "\n"
 		}
 
 		if e.OriginalError != nil {
-			logString = logString + "\nOriginalError: " + e.OriginalError.Error()
+			logString = logString + "OriginalError: " + e.OriginalError.Error() + "\n"
 		}
-
-		logString = logString + "\n--------------------------\n"
 
 		if e.StackTrace != "" {
-			logString = logString + e.StackTrace
+			logString = logString + "--------------------------\n"
+			logString = logString + e.StackTrace + "\n"
 		}
 
-		logString = logString + "\n=========================="
+		logString = logString + "=========================="
 
 		fmt.Println(logString)
 		// remove trace and query from object when debugging
