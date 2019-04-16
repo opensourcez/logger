@@ -52,7 +52,7 @@ type InformationConstruct struct {
 	Retries        int               `json:"Retries,omitempty" xml:"Retries"`
 	MaxRetries     int               `json:"MaxRetries,omitempty" xml:"MaxRetries"`
 	ReturnToClient bool              `json:"-" xml:"-"`
-	OriginalError  error             `json:"-" xml:"-"`
+	OriginalError  error             `json:"OriginalError" xml:"OriginalError"`
 	Hint           string            `json:"Hint,omitempty" xml:"Hint"`
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
 	Query          string            `json:"Query,omitempty" xml:"Query"`
@@ -65,10 +65,14 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		if e.Operation == nil {
 			e.Operation = &Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
 		}
-		logString := "============ LOG =======\nOperation.ID:" + e.Operation.ID + "\nMessage:" + e.Message
+		logString := "============ LOG =======\nOperationID: " + e.Operation.ID + "\nMessage: " + e.Message
 
 		if e.Query != "" {
-			logString = logString + "\nQuery:" + e.Query
+			logString = logString + "\nQuery: " + e.Query
+		}
+
+		if e.OriginalError != nil {
+			logString = logString + "\nOriginalError: " + e.OriginalError.Error()
 		}
 
 		logString = logString + "\n--------------------------\n"
@@ -78,6 +82,7 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		}
 
 		logString = logString + "\n=========================="
+
 		fmt.Println(logString)
 		// remove trace and query from object when debugging
 		e.StackTrace = ""
