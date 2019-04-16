@@ -52,7 +52,7 @@ type InformationConstruct struct {
 	Retries        int               `json:"Retries,omitempty" xml:"Retries"`
 	MaxRetries     int               `json:"MaxRetries,omitempty" xml:"MaxRetries"`
 	ReturnToClient bool              `json:"-" xml:"-"`
-	OriginalError  error             `json:"OriginalError" xml:"OriginalError"`
+	OriginalError  error             `json:"OriginalError,omitempty" xml:"OriginalError"`
 	Hint           string            `json:"Hint,omitempty" xml:"Hint"`
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
 	Query          string            `json:"Query,omitempty" xml:"Query"`
