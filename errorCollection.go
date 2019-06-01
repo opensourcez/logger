@@ -182,6 +182,10 @@ func GenericErrorWithMessage(original error, message string) *InformationConstru
 	error.OriginalError = original
 	return &error
 }
+func GenericMessage(message string) *InformationConstruct {
+	error := NewObject(message, 0)
+	return &error
+}
 func UnexpectedJWTSigningMethod(signingMethodInUse string) *InformationConstruct {
 	error := NewObject(MessageUnexpectedJWTSigningMethod+signingMethodInUse, HTTPCodeBadRequest)
 	error.ReturnToClient = true

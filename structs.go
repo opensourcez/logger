@@ -56,6 +56,7 @@ type InformationConstruct struct {
 	Hint           string            `json:"Hint,omitempty" xml:"Hint"`
 	StackTrace     string            `json:"StackTrace,omitempty" xml:"StackTrace"`
 	Query          string            `json:"Query,omitempty" xml:"Query"`
+	Session        string            `json:"Session,omitempty" xml:"Session"`
 }
 
 func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
@@ -73,6 +74,9 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 
 		if e.OriginalError != nil {
 			logString = logString + "OriginalError: " + e.OriginalError.Error() + "\n"
+		}
+		if e.Hint != "" {
+			logString = logString + "Hint: " + e.Hint + "\n"
 		}
 
 		if e.StackTrace != "" {
