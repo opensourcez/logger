@@ -81,17 +81,17 @@ func getSeverity(severity string) logging.Severity {
 	case "EMERGENCY":
 		return logging.Emergency
 	case "ERROR":
-		return logging.Emergency
+		return logging.Error
 	case "CRITICAL":
-		return logging.Emergency
+		return logging.Critical
 	case "ALERT":
-		return logging.Emergency
+		return logging.Alert
 	case "WARNING":
-		return logging.Emergency
+		return logging.Warning
 	case "NOTICE":
-		return logging.Emergency
+		return logging.Notice
 	case "INFO":
-		return logging.Emergency
+		return logging.Info
 	default:
 		return logging.Info
 	}
