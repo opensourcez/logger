@@ -10,12 +10,8 @@ func NewObject(message string, HTTPCode int) InformationConstruct {
 		Message:        message,
 		HTTPCode:       HTTPCode,
 		Timestamp:      int32(time.Now().Unix()),
-		Hint:           "",
 		Temporary:      false,
-		Retries:        0,
-		MaxRetries:     0,
 		ReturnToClient: false,
-		OriginalError:  nil,
 	}
 }
 
@@ -41,11 +37,11 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 		err = client.new(config)
 		l.Client = &client
 		break
-	case "crashguard":
-		client := CrashGuardClient{}
-		err = client.new(config)
-		l.Client = &client
-		break
+	// case "crashguard":
+	// 	client := CrashGuardClient{}
+	// 	err = client.new(config)
+	// 	l.Client = &client
+	// 	break
 	case "stdout":
 		client := StdClient{}
 		err = client.new(config)

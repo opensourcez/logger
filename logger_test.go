@@ -21,6 +21,20 @@ func TestNewError(t *testing.T) {
 	}
 }
 
+// func TestStuff(t *testing.T) {
+// 	host := "https://zeus.crashguard.io"
+
+// 	FormData := url.Values{
+// 		"api_key:": {"api_key:9bdbd23fe6e5"},
+// 	}
+// 	resp, err := http.PostForm(host, FormData)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	var result map[string]interface{}
+// 	json.NewDecoder(resp.Body).Decode(&result)
+// 	log.Println(result)
+// }
 func TestCloudShipping(t *testing.T) {
 	logger := Logger{}
 	err := logger.Init(&LoggingConfig{
