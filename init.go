@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+var internalLogger *Logger
+
 // NewObject ...
 func NewObject(message string, HTTPCode int) InformationConstruct {
 	return InformationConstruct{
@@ -55,6 +57,6 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 		err = client.new(config)
 		l.Client = &client
 	}
-
+	internalLogger = l
 	return
 }

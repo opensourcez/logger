@@ -27,8 +27,6 @@ func (g *GoogleClient) new(config *LoggingConfig) (err error) {
 
 	g.Client = newClient
 	g.Config = config
-	log.Println("client after init")
-	log.Println(g)
 	return nil
 }
 
@@ -48,6 +46,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 	// set the stack trace
 	stacktrace, err := getStack(g.Config)
 	if err != nil {
+		// TODO: handle better ??
 		log.Println(err) // handle this better
 	}
 	if stacktrace != "" {

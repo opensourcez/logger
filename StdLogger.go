@@ -17,11 +17,11 @@ func (g *StdClient) new(config *LoggingConfig) (err error) {
 
 func (g *StdClient) log(object *InformationConstruct, severity string, logTag string) {
 	// set the stack trace
-	stacktrace, err := getStack(g.Config)
-	if err != nil {
-		log.Println(err) // handle this better
-	}
-	if stacktrace != "" {
+	if object.StackTrace == "" {
+		stacktrace, err := getStack(g.Config)
+		if err != nil {
+			log.Println(err) // handle this better
+		}
 		object.StackTrace = stacktrace
 	}
 

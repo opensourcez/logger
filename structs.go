@@ -74,6 +74,8 @@ type InformationConstruct struct {
 	StackTrace string `json:"StackTrace,omitempty" xml:"StackTrace"`
 	// If a database or any kind of search was in play it can be placed here.
 	Query string `json:"Query,omitempty" xml:"Query"`
+	// If your database is in debug mode, it might include a timing otion
+	QueryTiming int64 `json:"QueryTiming,omitempty" xml:"QueryTiming"`
 	// The session that the error accoured in.
 	Session string `json:"Session,omitempty" xml:"Session"`
 }
@@ -106,9 +108,11 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 		logString = logString + "=========================="
 
 		fmt.Println(logString)
-		// remove trace and query from object when debugging
+		// Remove fields we have already displayed
 		e.StackTrace = ""
 		e.Query = ""
+		e.Hint = ""
+		e.Message = ""
 	}
 
 	log.Println(severity, logTag, e.JSON())
