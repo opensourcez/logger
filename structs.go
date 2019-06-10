@@ -3,6 +3,7 @@ package logger
 import (
 	"fmt"
 	"log"
+	"os"
 
 	gclogging "cloud.google.com/go/logging"
 	"github.com/google/uuid"
@@ -38,6 +39,13 @@ type CrashGuardClient struct {
 type StdClient struct {
 	Loggers map[string]string
 	Config  *LoggingConfig
+}
+type FileClient struct {
+	BaseLogFolder          string
+	fileChannels           map[string]chan []byte
+	BaseLogFilePermissions os.FileMode // default is 0660
+	Loggers                map[string]string
+	Config                 *LoggingConfig
 }
 
 // InformationConstruct ...

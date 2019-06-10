@@ -1,9 +1,5 @@
 package logger
 
-import (
-	"log"
-)
-
 func (g *StdClient) new(config *LoggingConfig) (err error) {
 
 	g.Loggers = make(map[string]string)
@@ -16,15 +12,12 @@ func (g *StdClient) new(config *LoggingConfig) (err error) {
 }
 
 func (g *StdClient) log(object *InformationConstruct, severity string, logTag string) {
-	// set the stack trace
 	if object.StackTrace == "" {
-		stacktrace, err := GetStack(g.Config)
+		err := GetStack(g.Config, object)
 		if err != nil {
-			log.Println(err) // handle this better
+			object.StackTrace = "Could not get stacktrace, error:" + err.Error()
 		}
-		object.StackTrace = stacktrace
 	}
-
 	object.print(logTag, severity, g.Config.Debug)
 }
 

@@ -46,32 +46,36 @@ func GetSimpleStack(asJSON bool) (string, error) {
 	return finalStack, nil
 }
 
-func GetStack(config *LoggingConfig) (stacktrace string, err error) {
+func GetStack(config *LoggingConfig, object *InformationConstruct) (err error) {
 
 	if config.WithTrace {
 		if config.TraceAsJSON {
 			if config.SimpleTrace {
-				stacktrace, err = GetSimpleStack(true)
+				stacktrace, err := GetSimpleStack(true)
 				if err != nil {
-					return "", err
+					return err
 				}
-				return
+				object.StackTrace = stacktrace
+				return nil
 			}
-			stacktrace = string(debug.Stack())
+			stacktrace := string(debug.Stack())
+			object.StackTrace = stacktrace
 			return
 
 		}
 		if config.SimpleTrace {
-			stacktrace, err = GetSimpleStack(false)
+			stacktrace, err := GetSimpleStack(false)
 			if err != nil {
-				return "", err
+				return err
 			}
-			return
+			object.StackTrace = stacktrace
+			return nil
 		}
-		stacktrace = string(debug.Stack())
-		return
+		stacktrace := string(debug.Stack())
+		object.StackTrace = stacktrace
+		return nil
 	}
 
 	// no trace
-	return "", nil
+	return nil
 }
