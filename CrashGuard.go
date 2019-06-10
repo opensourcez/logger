@@ -27,7 +27,7 @@ func (g *CrashGuardClient) log(object *InformationConstruct, severity string, lo
 		}
 	}(object, severity, logTag)
 
-	stacktrace, err := getStack(g.Config)
+	stacktrace, err := GetStack(g.Config)
 	if err != nil {
 		log.Println(err) // handle this better
 	}

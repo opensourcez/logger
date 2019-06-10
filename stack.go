@@ -46,7 +46,7 @@ func GetSimpleStack(asJSON bool) (string, error) {
 	return finalStack, nil
 }
 
-func getStack(config *LoggingConfig) (stacktrace string, err error) {
+func GetStack(config *LoggingConfig) (stacktrace string, err error) {
 
 	if config.WithTrace {
 		if config.TraceAsJSON {

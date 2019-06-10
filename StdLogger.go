@@ -18,7 +18,7 @@ func (g *StdClient) new(config *LoggingConfig) (err error) {
 func (g *StdClient) log(object *InformationConstruct, severity string, logTag string) {
 	// set the stack trace
 	if object.StackTrace == "" {
-		stacktrace, err := getStack(g.Config)
+		stacktrace, err := GetStack(g.Config)
 		if err != nil {
 			log.Println(err) // handle this better
 		}

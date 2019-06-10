@@ -44,7 +44,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 		}
 	}(object, severity, logTag)
 	// set the stack trace
-	stacktrace, err := getStack(g.Config)
+	stacktrace, err := GetStack(g.Config)
 	if err != nil {
 		// TODO: handle better ??
 		log.Println(err) // handle this better
