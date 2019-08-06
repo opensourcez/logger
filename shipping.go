@@ -9,7 +9,6 @@ func cleanInformationConstruct(str *InformationConstruct) {
 	str.Operation = nil
 	str.Labels = nil
 }
-
 func (l *Logger) checklogTag(logTag *string) {
 	if *logTag == "" {
 		*logTag = l.Config.DefaultLogTag

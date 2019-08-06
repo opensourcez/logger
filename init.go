@@ -4,18 +4,16 @@ import (
 	"time"
 )
 
+var internalLogger *Logger
+
 // NewObject ...
 func NewObject(message string, HTTPCode int) InformationConstruct {
 	return InformationConstruct{
 		Message:        message,
 		HTTPCode:       HTTPCode,
 		Timestamp:      int32(time.Now().Unix()),
-		Hint:           "",
 		Temporary:      false,
-		Retries:        0,
-		MaxRetries:     0,
 		ReturnToClient: false,
-		OriginalError:  nil,
 	}
 }
 
@@ -41,24 +39,24 @@ func (l *Logger) Init(config *LoggingConfig) (err error) {
 		err = client.new(config)
 		l.Client = &client
 		break
-	case "crashguard":
-		client := CrashGuardClient{}
+	// case "crashguard":
+	// 	client := CrashGuardClient{}
+	// 	err = client.new(config)
+	// 	l.Client = &client
+	// 	break
+	case "stdout":
+		client := StdClient{}
 		err = client.new(config)
 		l.Client = &client
-		break
-	case "stdout":
-		logger := StdClient{}
-		err = logger.new(config)
-		l.Client = &logger
 	case "aws":
 		panic("aws logger has not been implemented yet")
 	case "file":
 		panic("file logger has not been implemented yet")
 	default:
-		logger := StdClient{}
-		err = logger.new(config)
-		l.Client = &logger
+		client := StdClient{}
+		err = client.new(config)
+		l.Client = &client
 	}
-
+	internalLogger = l
 	return
 }

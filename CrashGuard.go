@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: Finish crashguard implementation
 func (g *CrashGuardClient) new(config *LoggingConfig) (err error) {
 
 	g.Config = config
@@ -26,12 +27,9 @@ func (g *CrashGuardClient) log(object *InformationConstruct, severity string, lo
 		}
 	}(object, severity, logTag)
 
-	stacktrace, err := getStack(g.Config)
+	err := GetStack(g.Config, object)
 	if err != nil {
-		log.Println(err) // handle this better
-	}
-	if stacktrace != "" {
-		object.StackTrace = stacktrace
+		object.StackTrace = "Could not get stacktrace, error:" + err.Error()
 	}
 
 	object.print(logTag, severity, g.Config.Debug)

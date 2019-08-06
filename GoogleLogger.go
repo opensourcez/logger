@@ -27,8 +27,6 @@ func (g *GoogleClient) new(config *LoggingConfig) (err error) {
 
 	g.Client = newClient
 	g.Config = config
-	log.Println("client after init")
-	log.Println(g)
 	return nil
 }
 
@@ -46,12 +44,9 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 		}
 	}(object, severity, logTag)
 	// set the stack trace
-	stacktrace, err := getStack(g.Config)
+	err := GetStack(g.Config, object)
 	if err != nil {
-		log.Println(err) // handle this better
-	}
-	if stacktrace != "" {
-		object.StackTrace = stacktrace
+		object.StackTrace = "Could not get stacktrace, error:" + err.Error()
 	}
 
 	// deconstruct labels and op from the construct
@@ -81,17 +76,17 @@ func getSeverity(severity string) logging.Severity {
 	case "EMERGENCY":
 		return logging.Emergency
 	case "ERROR":
-		return logging.Emergency
+		return logging.Error
 	case "CRITICAL":
-		return logging.Emergency
+		return logging.Critical
 	case "ALERT":
-		return logging.Emergency
+		return logging.Alert
 	case "WARNING":
-		return logging.Emergency
+		return logging.Warning
 	case "NOTICE":
-		return logging.Emergency
+		return logging.Notice
 	case "INFO":
-		return logging.Emergency
+		return logging.Info
 	default:
 		return logging.Info
 	}
