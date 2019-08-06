@@ -50,16 +50,18 @@ type FileClient struct {
 
 // InformationConstruct ...
 type InformationConstruct struct {
-	// The operation represents an execution chain, the ID of the operation can be used
-	// to corralate log entries.
+	// The operation represents an execution chain, the ID of
+	//the operation can be used to corralate log entries.
 	Operation *Operation `json:"Operation,omitempty" xml:"Operation"`
 	// Key/value labels
-	Labels  map[string]string `json:"Labels,omitempty" xml:"Labels"`
-	Message string            `json:"Message,omitempty" xml:"Message"`
+	Labels map[string]string `json:"Labels,omitempty" xml:"Labels"`
+	// A custom error message
+	Message string `json:"Message,omitempty" xml:"Message"`
 	// Internal error code
 	Code string `json:"Code,omitempty" xml:"Code"`
-	// external http error code
-	HTTPCode  int   `json:"HTTPCode,omitempty" xml:"HTTPCode"`
+	// HTTP error code
+	HTTPCode int `json:"HTTPCode,omitempty" xml:"HTTPCode"`
+	// A custom timestamp
 	Timestamp int32 `json:"Timestamp,omitempty" xml:"Timestamp"`
 	// Indicates if the error is temporary. If a method fails with a temporary error
 	// it can most of the time be retired within a certain time frame.
@@ -78,13 +80,14 @@ type InformationConstruct struct {
 	// The original error that caused the problem.
 	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
 	// A hint for developers on how to potentially fix thid problem
-	Hint       string `json:"Hint,omitempty" xml:"Hint"`
+	Hint string `json:"Hint,omitempty" xml:"Hint"`
+	// The current stack trace.
 	StackTrace string `json:"StackTrace,omitempty" xml:"StackTrace"`
-	// If a database or any kind of search was in play it can be placed here.
+	// If a database query or any kind of search parameters were in play they can be placed here.
 	Query string `json:"Query,omitempty" xml:"Query"`
-	// If your database is in debug mode, it might include a timing otion
+	// The timing of the before mentioned query
 	QueryTiming int64 `json:"QueryTiming,omitempty" xml:"QueryTiming"`
-	// The session that the error accoured in.
+	// The current session
 	Session string `json:"Session,omitempty" xml:"Session"`
 }
 
@@ -128,13 +131,18 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 
 // LoggingConfig ...
 type LoggingConfig struct {
-	// A project ID ( optional for stdout logging )
-	ProjectID string
-	// For google, this indicates the default logger used
-	// for stdout this is a tag that will be placed on the log as it's printed
-	// for the file logger this indicates the default file for this log.
+	// The type of logging config.
+	// Available as of this moment:
+	// 1. google ( in development )
+	// 2. stdout
+	Type string
+	// The default tag or file used for your log entries.
+	// For Type:google, this indicates the default logger used
+	// for Type:stdout this is a tag that will be placed on the log as it's printed
 	DefaultLogTag string
-	// the list of available loggers, files, tags .. etc.. ( see default log tag for more information )
+	// This is the list of available logs
+	// for Type:google this indicates files in their log menu
+	// for Type:stdout this indicates .. nothing, yet.
 	Logs []string
 	// Do you want a stack trace with your log ?
 	WithTrace bool
@@ -144,11 +152,8 @@ type LoggingConfig struct {
 	SimpleTrace bool
 	// Are we in debug mode ?
 	Debug bool
-	// The type of logging config.
-	// Available as of this moment:
-	// 1. google
-	// 2. stdout
-	Type string
+	// Only used for Type:google
+	ProjectID string
 }
 
 // Operation ...

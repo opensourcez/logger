@@ -101,7 +101,7 @@ func s1() {
 		DefaultLogTag: "general",
 		WithTrace:     true,
 		TraceAsJSON:   false,
-		SimpleTrace:   true,
+		SimpleTrace:   false,
 		Debug:         true,
 		Type:          "stdout",
 	})
