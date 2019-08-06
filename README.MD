@@ -2,16 +2,15 @@
 <img src="gopher.png" alt="drawing" width="250"/>
 
 # About
-Hey there, sup?<br>
-This logger was made to wrap a generic golang error with richer informational content and capabilities. <br>
-Additionally this module provides error shortcuts for time saving. <br>
-This module is still in development but I would love any and all help with it's progress. <br>Poke me at sveinn@zkynet.io if you want to contribute, or just fork and PR <3
+This logger was made to wrap a generic golang error with richer informational content, cleaner stack trace and more capabilities.Additionally this module provides error shortcuts for time saving. This module is still in development but I would love any and all help with it's progress. <br><br>Poke me at sveinn@zkynet.io if you want to contribute, or just fork and PR <3
 
 
 # Installation 
  $ go get github.com/zkynetio/logger
 
 # Settings
+### Shortcuts
+https://github.com/zkynetio/logger/blob/master/errorCollection.go
 ## Global logger settings
 These can also be edited at runtime.
 ```golang
@@ -42,7 +41,7 @@ type LoggingConfig struct {
 	ProjectID string
 }
 ```
-### The Information Construct ( aka logger object )
+## The Information Construct ( aka logger object )
 ```golang
 // InformationConstruct ...
 type InformationConstruct struct {
@@ -158,7 +157,6 @@ defer func() {
             Producer: "main.openConnection()",
         },
     }, "startup-crash")
-    monitor <- port
 }()
 ```
 ## Example output in debug mode.
@@ -261,5 +259,3 @@ created by testing.(*T).Run
 2019/08/06 16:22:56 ERROR my-custom-log-tag {"Operation":{"ID":"123123jb123b12","Producer":"requestid or namespace or anything really..","First":true},"Labels":{"CUSTOMER":"Google","PATH":"/some/path/to/awesomeness","RANDOM":"whatDoYouNeedHere?","SHORTCODE":"Goo"},"HTTPCode":500,"Timestamp":1565097776}
 ```
 
-# Shortcuts
-https://github.com/zkynetio/logger/blob/master/errorCollection.go
