@@ -34,10 +34,10 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 
 	defer func(object *InformationConstruct, severity string, logTag string) {
 		if r := recover(); r != nil {
-			if object.Operation != nil {
+			if object.Operation.ID != "" {
 				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
 			} else {
-				object.Operation = &Operation{ID: uuid.New().String()}
+				object.Operation = Operation{ID: uuid.New().String()}
 				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
 			}
 			object.print(logTag, severity, g.Config.Debug)
@@ -55,6 +55,9 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 	// cleanup
 	cleanInformationConstruct(object)
 
+	if object.LogTag == "" {
+		object.LogTag = severity
+	}
 	// ship
 	g.Loggers[logTag].Log(logging.Entry{
 		InsertID: uuid.New().String(),
@@ -62,7 +65,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 		Timestamp: time.Now(),
 		Labels:    labels,
 		Payload:   object,
-		Severity:  getSeverity(severity),
+		Severity:  getSeverity(object.LogTag),
 		Operation: &logpb.LogEntryOperation{
 			Id:       op.ID,
 			Producer: op.Producer,

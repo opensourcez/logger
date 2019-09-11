@@ -7,13 +7,39 @@ import (
 
 	gclogging "cloud.google.com/go/logging"
 	"github.com/google/uuid"
+	"github.com/zkynetio/safelocker"
 )
+
+func (l *Logger) AddToChain(id string, logItem InformationConstruct) {
+	l.Lock()
+	defer l.Unlock()
+	l.Chain[id] = append(l.Chain[id], logItem)
+}
+func (l *Logger) LogOperationChain(id string) {
+	l.Lock()
+	defer l.Unlock()
+	for _, v := range l.Chain[id] {
+		if v.LogLevel == "" {
+			v.LogLevel = "INFO"
+		}
+
+		l.logit(&v, v.LogLevel, v.LogTag)
+	}
+	delete(l.Chain, id)
+}
+func (l *Logger) DeleteChain(id string) {
+	l.Lock()
+	defer l.Unlock()
+	delete(l.Chain, id)
+}
 
 // Logger ...
 // The base logging struct
 type Logger struct {
 	Config *LoggingConfig
 	Client LoggingClient
+	safelocker.SafeLocker
+	Chain map[string][]InformationConstruct
 }
 
 // LoggingClient ...
@@ -50,9 +76,13 @@ type FileClient struct {
 
 // InformationConstruct ...
 type InformationConstruct struct {
+	// A log level specifically for this log entry
+	LogLevel string `json:"Loglevel,omitempty" xml:"LogLevel"`
+	// A custom log tag for this specific log entry
+	LogTag string `json:"LogTag,omitempty" xml:"LogTag"`
 	// The operation represents an execution chain, the ID of
 	//the operation can be used to corralate log entries.
-	Operation *Operation `json:"Operation,omitempty" xml:"Operation"`
+	Operation Operation `json:"Operation,omitempty" xml:"Operation"`
 	// Key/value labels
 	Labels map[string]string `json:"Labels,omitempty" xml:"Labels"`
 	// A custom error message
@@ -95,8 +125,8 @@ func (e *InformationConstruct) print(logTag string, severity string, debug bool)
 
 	if debug {
 		// if we do not have an opperation we add one.
-		if e.Operation == nil {
-			e.Operation = &Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
+		if e.Operation.ID == "" {
+			e.Operation = Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
 		}
 		logString := "============ DEBUG ENTRY =======\nOperationID: " + e.Operation.ID + "\nMessage: " + e.Message + "\n"
 

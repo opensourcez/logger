@@ -35,9 +35,8 @@ func TestNewError(t *testing.T) {
 // 	json.NewDecoder(resp.Body).Decode(&result)
 // 	log.Println(result)
 // }
-func TestCloudShipping(t *testing.T) {
-	logger := Logger{}
-	err := logger.Init(&LoggingConfig{
+func CloudShipping(t *testing.T) {
+	err, logger := Init(&LoggingConfig{
 		ProjectID:     "heroic-truck-168212",
 		DefaultLogTag: "general",
 		Logs:          []string{"transaction", "error", "activity"},
@@ -54,7 +53,7 @@ func TestCloudShipping(t *testing.T) {
 		panic(err)
 	}
 
-	op := &Operation{
+	op := Operation{
 		Producer: "GET: /some/path/to/awesomeness",
 		ID:       "123123jb123b12",
 		First:    true,
@@ -83,25 +82,12 @@ func TestCloudShipping(t *testing.T) {
 
 }
 
-func TestStdOutShipping(t *testing.T) {
-
-	//time.Sleep(time.Second * 10)
-	s3()
-	time.Sleep(time.Second * 5)
-}
-func s3() {
-	s2()
-}
-func s2() {
-	s1()
-}
-func s1() {
-	logger := Logger{}
-	err := logger.Init(&LoggingConfig{
+func TestOperationChain(t *testing.T) {
+	err, logger := Init(&LoggingConfig{
 		DefaultLogTag: "general",
 		WithTrace:     true,
 		TraceAsJSON:   false,
-		SimpleTrace:   false,
+		SimpleTrace:   true,
 		Debug:         true,
 		Type:          "stdout",
 	})
@@ -110,7 +96,72 @@ func s1() {
 		panic(err)
 	}
 
-	op := &Operation{
+	op := Operation{
+		Producer: "requestid or namespace or anything really..",
+		ID:       "123123jb123b12",
+		First:    true,
+		Last:     false,
+	}
+
+	newError := GenericErrorWithMessage(nil, "Error1")
+	newError.Operation = op
+	newError.Labels = make(map[string]string)
+	newError.Labels["Key"] = "value for error 1"
+	newError.LogLevel = "INFO"
+	logger.AddToChain(newError.Operation.ID, *newError)
+
+	op.First = false
+	newError = GenericErrorWithMessage(nil, "Error2")
+	newError.Operation = op
+	newError.Labels = make(map[string]string)
+	newError.Labels["Key"] = "value for error 2"
+	newError.LogLevel = "ERROR"
+	logger.AddToChain(newError.Operation.ID, *newError)
+
+	newError = GenericErrorWithMessage(nil, "Error3")
+	newError.Operation = op
+	newError.Labels = make(map[string]string)
+	newError.Labels["Key"] = "value for error 3"
+	newError.LogLevel = "EMERGENCY"
+	logger.AddToChain(newError.Operation.ID, *newError)
+
+	op.Last = true
+	newError = GenericErrorWithMessage(nil, "Error4")
+	newError.Operation = op
+	newError.Labels = make(map[string]string)
+	newError.Labels["Key"] = "value for error 4"
+	newError.LogLevel = "EMERGENCY"
+	logger.AddToChain(newError.Operation.ID, *newError)
+
+	logger.LogOperationChain(op.ID)
+}
+func TestStdOutShipping(t *testing.T) {
+
+	//time.Sleep(time.Second * 10)
+	s3()
+	// time.Sleep(time.Second * 5)
+}
+func s3() {
+	s2()
+}
+func s2() {
+	s1()
+}
+func s1() {
+	err, logger := Init(&LoggingConfig{
+		DefaultLogTag: "general",
+		WithTrace:     true,
+		TraceAsJSON:   false,
+		SimpleTrace:   true,
+		Debug:         true,
+		Type:          "stdout",
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	op := Operation{
 		Producer: "requestid or namespace or anything really..",
 		ID:       "123123jb123b12",
 		First:    true,

@@ -30,7 +30,18 @@ func ParsePGCode(code string, customMessage string) (outError *InformationConstr
 	}
 	return
 }
-func ParsePGError(err *pgx.Error) (outError *InformationConstruct) {
+func ParsePGError(er error) (outError *InformationConstruct) {
+	ispgerror := false
+	switch er.(type) {
+	case *pgx.Error:
+		ispgerror = true
+	default:
+		return nil
+	}
+	if !ispgerror {
+		return nil
+	}
+	err := er.(*pgx.Error)
 	switch err.Code {
 	case "42703": // Column not found error
 		outError = BadRequest(err, err.Routine)
@@ -42,13 +53,15 @@ func ParsePGError(err *pgx.Error) (outError *InformationConstruct) {
 		outError.Message = err.Message
 	case "22P02": // bad syntax error for UUID
 		outError = BadRequest(err, err.Routine)
-		outError.Hint = "You have an inalid UUID in your database transaction"
+		outError.Hint = "You have an inalid PRIMARY ID in your database transaction"
 		outError.Message = err.Message
 	case "42P01": // table not found
 		outError = BadRequest(err, err.Routine)
 		outError.Hint = "You are trying to save data to a table that does not exist, double check your table names"
 		outError.Message = "This table does not appear to exist: " + strings.Split(err.Message, " ")[2]
 	default:
+		// this is  away to catch errors that are not supported.
+		// so that they can be added.
 		PrintObject(err)
 	}
 	return

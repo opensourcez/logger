@@ -4,6 +4,8 @@
 # About
 This logger was made to wrap a generic golang error with richer informational content, cleaner stack trace and more capabilities.Additionally this module provides error shortcuts for time saving. This module is still in development but I would love any and all help with it's progress. <br><br>Poke me at sveinn@zkynet.io if you want to contribute, or just fork and PR <3
 
+# Usage
+Look at the test file to see usage: logger_test.go 
 
 # Installation 
  $ go get github.com/zkynetio/logger
@@ -20,6 +22,7 @@ type LoggingConfig struct {
 	// Available as of this moment:
 	// 1. google ( in development )
 	// 2. stdout
+	// 3.file
 	Type string
 	// The default tag or file used for your log entries.
 	// For Type:google, this indicates the default logger used
@@ -45,9 +48,13 @@ type LoggingConfig struct {
 ```golang
 // InformationConstruct ...
 type InformationConstruct struct {
+	// A log level specifically for this log entry
+	LogLevel string `json:"Loglevel,omitempty" xml:"LogLevel"`
+	// A custom log tag for this specific log entry
+	LogTag string `json:"LogTag,omitempty" xml:"LogTag"`
 	// The operation represents an execution chain, the ID of
 	//the operation can be used to corralate log entries.
-	Operation *Operation `json:"Operation,omitempty" xml:"Operation"`
+	Operation Operation `json:"Operation,omitempty" xml:"Operation"`
 	// Key/value labels
 	Labels map[string]string `json:"Labels,omitempty" xml:"Labels"`
 	// A custom error message
@@ -103,9 +110,9 @@ type Operation struct {
 ```golang
 import L "github.com/zkynetio/logger"
 
-var globalLogger *L.Logger
+var GlobalLogger *L.Logger
 
-logger.Init(&L.LoggingConfig{
+err, GlobalLogger := Init(&L.LoggingConfig{
     DefaultLogTag: "your-default-log-tag",
     WithTrace:     true,
     TraceAsJSON:   false,
@@ -138,7 +145,7 @@ func (nl *NodeList) Connect(runtimeError L.InformationConstruct) {
         runtimeError.Labels["type"] = "goroutine"
         runtimeError.Labels["nr"] = "8"
         runtimeError.Labels["method"] = "(*NodeList)Connect()"
-        globalLogger.CRITICAL(runtimeError, "")
+        GlobalLogger.CRITICAL(runtimeError, "")
     }()
 ```
 ## Here is an all-in-one example from a real world cenario
@@ -146,11 +153,11 @@ func (nl *NodeList) Connect(runtimeError L.InformationConstruct) {
 ```golang
 defer func() {
     r := recover()
-    globalLogger.CRITICAL(L.InformationConstruct{
+    GlobalLogger.CRITICAL(L.InformationConstruct{
         Message:       "Node crashed on ip/port: " + ms.ThisNode.ServerIP + ":" + port,
         OriginalError: L.GetRecoverError(r),
         Labels: map[string]string{"ListenerType":strconv.Itoa(listenerType)}
-        Operation: &L.Operation{
+        Operation: L.Operation{
             ID:       opID.String(),
             Last:     true,
             First:    false,

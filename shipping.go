@@ -6,7 +6,7 @@ import (
 )
 
 func cleanInformationConstruct(str *InformationConstruct) {
-	str.Operation = nil
+	str.Operation = Operation{}
 	str.Labels = nil
 }
 func (l *Logger) checklogTag(logTag *string) {
@@ -40,28 +40,35 @@ func GetHTTPCode(err error) int {
 }
 
 func (l *Logger) ERROR(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "ERROR")
+	construct.LogLevel = "ERROR"
+	l.logit(&construct, logTag, "ERROR")
 }
 func (l *Logger) EMERGENCY(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "EMERGENCY")
+	construct.LogLevel = "EMERGENCY"
+	l.logit(&construct, logTag, "EMERGENCY")
 }
 func (l *Logger) CRITICAL(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "CRITICAL")
+	construct.LogLevel = "CRITICAL"
+	l.logit(&construct, logTag, "CRITICAL")
 }
 func (l *Logger) ALERT(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "ALERT")
+	construct.LogLevel = "ALERT"
+	l.logit(&construct, logTag, "ALERT")
 }
 func (l *Logger) WARNING(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "WARNING")
+	construct.LogLevel = "WARNING"
+	l.logit(&construct, logTag, "WARNING")
 }
 func (l *Logger) NOTICE(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "NOTICE")
+	construct.LogLevel = "NOTICE"
+	l.logit(&construct, logTag, "NOTICE")
 }
 func (l *Logger) INFO(construct InformationConstruct, logTag string) {
-	l.logit(construct, logTag, "INFO")
+	construct.LogLevel = "INFO"
+	l.logit(&construct, logTag, "INFO")
 }
 
-func (l *Logger) logit(construct InformationConstruct, logTag string, severity string) {
+func (l *Logger) logit(construct *InformationConstruct, logTag string, severity string) {
 	l.checklogTag(&logTag)
-	l.Client.log(&construct, severity, logTag)
+	l.Client.log(construct, severity, logTag)
 }
