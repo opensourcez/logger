@@ -16,12 +16,14 @@ func NewObject(message string, HTTPCode int) InformationConstruct {
 		ReturnToClient: false,
 	}
 }
-func NewDBRInterface(logtag string, showTiming, showErrors, showInfo bool) DBREventReceiver {
+func NewDBRInterface(logtag string, showTiming, showErrors, showInfo, addToChain bool, opID string) DBREventReceiver {
 	return DBREventReceiver{
 		LogTag:     logtag,
 		ShowInfo:   showInfo,
 		ShowErrors: showErrors,
 		ShowTiming: showTiming,
+		AddToChain: addToChain,
+		OPID:       opID,
 	}
 }
 

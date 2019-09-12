@@ -104,11 +104,10 @@ type InformationConstruct struct {
 	// How often should you retry the method that caused this error.
 	MaxRetries int `json:"MaxRetries,omitempty" xml:"MaxRetries"`
 	// Should this error be returned to the external client. This variable being set to false
-	// indicates this is an internal error and that a different error should be returned to the
-	// end user.
+	// indicates this is an internal error and only the code + message will be returned to the user
 	ReturnToClient bool `json:"-" xml:"-"`
 	// The original error that caused the problem.
-	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
+	OriginalError error `json:"OriginalErrur,omitempty" xml:"OriginalError"`
 	// A hint for developers on how to potentially fix thid problem
 	Hint string `json:"Hint,omitempty" xml:"Hint"`
 	// The current stack trace.

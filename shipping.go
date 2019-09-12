@@ -2,6 +2,7 @@ package logger
 
 import (
 	"encoding/json"
+	"log"
 	"reflect"
 )
 
@@ -16,11 +17,32 @@ func (l *Logger) checklogTag(logTag *string) {
 }
 
 func (e InformationConstruct) Error() string {
+	if !e.ReturnToClient {
+		return e.Code + ":" + e.Message
+	}
+	if internalLogger.Config.Debug {
+		log.Println("DEBUG ENBALE...")
+		outJSON, err := json.Marshal(e)
+		if err != nil {
+			return JSONEncoding(err).Error()
+		}
+		return string(outJSON)
+	}
+
+	e.OriginalError = nil
+	e.Hint = ""
+	e.StackTrace = ""
+	e.Query = ""
+	e.QueryTiming = 0
+	e.Labels = nil
+	e.Session = ""
+
 	outJSON, err := json.Marshal(e)
 	if err != nil {
 		return JSONEncoding(err).Error()
 	}
 	return string(outJSON)
+
 }
 
 func (i InformationConstruct) JSON() string {

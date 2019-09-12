@@ -36,10 +36,10 @@ func ParsePGError(er error) (outError *InformationConstruct) {
 	case *pgx.Error:
 		ispgerror = true
 	default:
-		return nil
+		return GenericError(er)
 	}
 	if !ispgerror {
-		return nil
+		return GenericError(er)
 	}
 	err := er.(*pgx.Error)
 	switch err.Code {
@@ -59,6 +59,9 @@ func ParsePGError(er error) (outError *InformationConstruct) {
 		outError = BadRequest(err, err.Routine)
 		outError.Hint = "You are trying to save data to a table that does not exist, double check your table names"
 		outError.Message = "This table does not appear to exist: " + strings.Split(err.Message, " ")[2]
+	case "42701":
+		outError = BadRequest(err, err.Routine)
+		outError.Message = err.Message
 	default:
 		// this is  away to catch errors that are not supported.
 		// so that they can be added.
