@@ -10,26 +10,6 @@ import (
 	pgx "github.com/lib/pq"
 )
 
-// TODO: add more codes.
-func ParsePGCode(code string, customMessage string) (outError *InformationConstruct) {
-	switch code {
-	case "42703": // Column not found error
-		outError = BadRequest(nil, customMessage)
-		outError.Hint = "Unknown column"
-	case "42601": // bad syntax error
-		outError = BadRequest(nil, customMessage)
-		outError.Hint = "Your syntax might be off, review all your column and table references."
-	case "22P02": // bad syntax error for UUID
-		outError = BadRequest(nil, customMessage)
-		outError.Hint = "You have an inalid UUID in your database transaction"
-	case "42P01": // table not found
-		outError = BadRequest(nil, customMessage)
-		outError.Hint = "You are trying to save data to a table that does not exist, double check your table names"
-	default:
-		outError = BadRequest(nil, code+":"+customMessage)
-	}
-	return
-}
 func ParsePGError(er error) (outError *InformationConstruct) {
 	ispgerror := false
 	switch er.(type) {
@@ -43,25 +23,45 @@ func ParsePGError(er error) (outError *InformationConstruct) {
 	}
 	err := er.(*pgx.Error)
 	switch err.Code {
+	case "42702":
+		outError = BadRequest(err, err.Detail)
+		outError.Hint = err.Hint
+		outError.Message = err.Message
+		outError.Code = "42702"
+	case "23502":
+		outError = BadRequest(err, err.Detail)
+		outError.Hint = err.Hint
+		outError.Message = err.Message
+		outError.Code = "23502"
+	case "23505":
+		outError = BadRequest(err, err.Detail)
+		outError.Hint = err.Hint
+		outError.Message = err.Message
+		outError.Code = "23505"
 	case "42703": // Column not found error
 		outError = BadRequest(err, err.Routine)
 		outError.Hint = err.Hint
 		outError.Message = "This column does not appear to exist: " + strings.Split(err.Message, " ")[2]
+		outError.Code = "42307"
 	case "42601": // bad syntax error
 		outError = BadRequest(err, err.Routine)
 		outError.Hint = "Your syntax might be off, review all your column and table references."
 		outError.Message = err.Message
+		outError.Code = "42601"
 	case "22P02": // bad syntax error for UUID
 		outError = BadRequest(err, err.Routine)
 		outError.Hint = "You have an inalid PRIMARY ID in your database transaction"
 		outError.Message = err.Message
+		outError.Code = "22P02"
 	case "42P01": // table not found
 		outError = BadRequest(err, err.Routine)
-		outError.Hint = "You are trying to save data to a table that does not exist, double check your table names"
+		outError.Hint = "You are trying to interact with a table that does not exist, double check your table names"
 		outError.Message = "This table does not appear to exist: " + strings.Split(err.Message, " ")[2]
+		outError.Code = "42P01"
 	case "42701":
 		outError = BadRequest(err, err.Routine)
 		outError.Message = err.Message
+		outError.Code = "42701"
 	default:
 		// this is  away to catch errors that are not supported.
 		// so that they can be added.

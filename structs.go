@@ -13,6 +13,7 @@ import (
 func (l *Logger) AddToChain(id string, logItem InformationConstruct) {
 	l.Lock()
 	defer l.Unlock()
+	_ = GetStack(l.Config, &logItem)
 	l.Chain[id] = append(l.Chain[id], logItem)
 }
 func (l *Logger) LogOperationChain(id string) {
@@ -107,7 +108,7 @@ type InformationConstruct struct {
 	// indicates this is an internal error and only the code + message will be returned to the user
 	ReturnToClient bool `json:"-" xml:"-"`
 	// The original error that caused the problem.
-	OriginalError error `json:"OriginalErrur,omitempty" xml:"OriginalError"`
+	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
 	// A hint for developers on how to potentially fix thid problem
 	Hint string `json:"Hint,omitempty" xml:"Hint"`
 	// The current stack trace.

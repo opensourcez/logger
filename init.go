@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"log"
 	"time"
 )
 
@@ -50,15 +51,15 @@ func Init(config *LoggingConfig) (err error, l *Logger) {
 		l.Client = &client
 		break
 	case "crashguard":
-		panic("CrashGuard logger has not been implemented yet")
+		log.Println("CrashGuard logger has not been implemented yet")
 	case "stdout":
 		client := StdClient{}
 		err = client.new(config)
 		l.Client = &client
 	case "aws":
-		panic("aws logger has not been implemented yet")
+		log.Println("aws logger has not been implemented yet")
 	case "file":
-		panic("File logging should be handled by you os <3")
+		log.Println("File logging should be handled by you os <3")
 	default:
 		client := StdClient{}
 		err = client.new(config)

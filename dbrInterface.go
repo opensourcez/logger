@@ -31,7 +31,7 @@ func (d *DBREventReceiver) Event(eventName string) {
 // optional key/value data.
 func (d *DBREventReceiver) EventKv(eventName string, kvs map[string]string) {
 	if d.ShowInfo {
-		event := GenericMessage("QUERY EVENT")
+		event := GenericMessage("QUERY EVENT WITH KEY/VALUE")
 		event.Query = eventName
 		event.Labels = kvs
 		event.LogLevel = "INFO"
