@@ -2,7 +2,6 @@ package logger
 
 import (
 	"encoding/json"
-	"log"
 	"reflect"
 )
 
@@ -21,7 +20,6 @@ func (e InformationConstruct) Error() string {
 		return e.Code + ":" + e.Message
 	}
 	if internalLogger.Config.Debug {
-		log.Println("DEBUG ENBALE...")
 		outJSON, err := json.Marshal(e)
 		if err != nil {
 			return JSONEncoding(err).Error()
