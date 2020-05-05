@@ -50,6 +50,7 @@ func (d *DBREventReceiver) EventErr(eventName string, err error) error {
 	event := ParsePGError(err)
 	event.Query = eventName
 	event.LogLevel = "ERROR"
+	event.Message = err.Error()
 	event.Operation = Operation{ID: d.OPID}
 	event.LogTag = d.LogTag
 	if d.ShowErrors {
@@ -70,6 +71,7 @@ func (d *DBREventReceiver) EventErrKv(eventName string, err error, kvs map[strin
 	event.Labels = kvs
 	event.Operation = Operation{ID: d.OPID}
 	event.LogLevel = "ERROR"
+	event.Message = err.Error()
 	event.LogTag = d.LogTag
 	if d.ShowErrors {
 		if d.AddToChain {
