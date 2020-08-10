@@ -1,38 +1,11 @@
 package logger
 
 import (
-	"fmt"
-	"log"
 	"os"
 
 	gclogging "cloud.google.com/go/logging"
-	"github.com/google/uuid"
 	"github.com/zkynetio/safelocker"
 )
-
-func (l *Logger) AddToChain(id string, logItem InformationConstruct) {
-	l.Lock()
-	defer l.Unlock()
-	_ = GetStack(l.Config, &logItem)
-	l.Chain[id] = append(l.Chain[id], logItem)
-}
-func (l *Logger) LogOperationChain(id string) {
-	l.Lock()
-	defer l.Unlock()
-	for _, v := range l.Chain[id] {
-		if v.LogLevel == "" {
-			v.LogLevel = "INFO"
-		}
-
-		l.logit(&v, v.LogLevel, v.LogTag)
-	}
-	delete(l.Chain, id)
-}
-func (l *Logger) DeleteChain(id string) {
-	l.Lock()
-	defer l.Unlock()
-	delete(l.Chain, id)
-}
 
 // Logger ...
 // The base logging struct
@@ -93,7 +66,7 @@ type InformationConstruct struct {
 	// HTTP error code
 	HTTPCode int `json:"HTTPCode,omitempty" xml:"HTTPCode"`
 	// A custom timestamp
-	Timestamp int32 `json:"Timestamp,omitempty" xml:"Timestamp"`
+	Timestamp int64 `json:"Timestamp,omitempty" xml:"Timestamp"`
 	// Indicates if the error is temporary. If a method fails with a temporary error
 	// it can most of the time be retired within a certain time frame.
 	Temporary bool `json:"Temporary,omitempty" xml:"Temporary"`
@@ -111,8 +84,10 @@ type InformationConstruct struct {
 	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
 	// A hint for developers on how to potentially fix thid problem
 	Hint string `json:"Hint,omitempty" xml:"Hint"`
-	// The current stack trace.
-	StackTrace string `json:"StackTrace,omitempty" xml:"StackTrace"`
+	// The current stack trace in slice format
+	StackTrace string `json:"-" xml:"-"`
+	// The current stack trace in string format
+	SliceStack []string `json:"StackTrace,omitempty" xml:"StackTrace"`
 	// If a database query or any kind of search parameters were in play they can be placed here.
 	Query string `json:"Query,omitempty" xml:"Query"`
 	// The timing of the before mentioned query
@@ -121,69 +96,26 @@ type InformationConstruct struct {
 	Session string `json:"Session,omitempty" xml:"Session"`
 }
 
-func (e *InformationConstruct) print(logTag string, severity string, debug bool) {
-
-	if debug {
-		// if we do not have an opperation we add one.
-		if e.Operation.ID == "" {
-			e.Operation = Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
-		}
-		logString := "============ DEBUG ENTRY =======\nOperationID: " + e.Operation.ID + "\nMessage: " + e.Message + "\n"
-
-		if e.Query != "" {
-			logString = logString + "Query: " + e.Query + "\n"
-		}
-
-		if e.OriginalError != nil {
-			logString = logString + "OriginalError: " + e.OriginalError.Error() + "\n"
-		}
-		if e.Hint != "" {
-			logString = logString + "Hint: " + e.Hint + "\n"
-		}
-
-		if e.StackTrace != "" {
-			logString = logString + "--------------------------\n"
-			logString = logString + e.StackTrace + "\n"
-		}
-
-		logString = logString + "=========================="
-
-		fmt.Println(logString)
-		// Remove fields we have already displayed
-		e.StackTrace = ""
-		e.Query = ""
-		e.Hint = ""
-		e.Message = ""
-	}
-
-	log.Println(severity, logTag, e.JSON())
-}
-
 // LoggingConfig ...
 type LoggingConfig struct {
+	// Enable or disable colors
+	Colors bool
 	// The type of logging config.
-	// Available as of this moment:
-	// 1. google ( in development )
-	// 2. stdout
+	// 1. stdout
 	Type string
-	// The default tag or file used for your log entries.
-	// For Type:google, this indicates the default logger used
-	// for Type:stdout this is a tag that will be placed on the log as it's printed
+	// The default tag used for your logs.
 	DefaultLogTag string
-	// This is the list of available logs
-	// for Type:google this indicates files in their log menu
-	// for Type:stdout this indicates .. nothing, yet.
-	Logs []string
 	// Do you want a stack trace with your log ?
 	WithTrace bool
-	// Do you want your stacktrace as a json object ?
-	TraceAsJSON bool
 	// Do you want the simplified stack trace or the default one ?
 	SimpleTrace bool
-	// Are we in debug mode ?
-	Debug bool
+	// Enable pretty printing in the console
+	PrettyPrint bool
 	// Only used for Type:google
 	ProjectID string
+
+	// This field is only for google cloud logging, which is still in development
+	Logs []string
 }
 
 // Operation ...

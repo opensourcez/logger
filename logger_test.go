@@ -1,94 +1,61 @@
 package logger
 
 import (
-	"fmt"
 	"testing"
-	"time"
 )
 
-func ExamplePrint() {
-	fmt.Println("mowmoemw")
-	// output: mowmoemw
-}
+// func CloudShipping(t *testing.T) {
+// 	err, logger := Init(&LoggingConfig{
+// 		ProjectID:     "heroic-truck-168212",
+// 		DefaultLogTag: "general",
+// 		// Logs:          []string{"transaction", "error", "activity"},
+// 		WithTrace:   true,
+// 		SimpleTrace: true,
+// 		PrettyPrint: true,
+// 		Type:        "google",
+// 	})
 
-func TestNewError(t *testing.T) {
-	error := NewObject("some message", 400)
-	if error.HTTPCode != 400 {
-		t.Error("did not get the right code")
-	}
-	if error.Message != "some message" {
-		t.Error("did not get the right message")
-	}
-}
+// 	//log.Println(logger)
 
-// func TestStuff(t *testing.T) {
-// 	host := "https://zeus.crashguard.io"
-
-// 	FormData := url.Values{
-// 		"api_key:": {"api_key:9bdbd23fe6e5"},
-// 	}
-// 	resp, err := http.PostForm(host, FormData)
 // 	if err != nil {
 // 		panic(err)
 // 	}
-// 	var result map[string]interface{}
-// 	json.NewDecoder(resp.Body).Decode(&result)
-// 	log.Println(result)
+
+// 	op := Operation{
+// 		Producer: "GET: /some/path/to/awesomeness",
+// 		ID:       "123123jb123b12",
+// 		First:    true,
+// 		Last:     false,
+// 	}
+// 	labels := make(map[string]string)
+// 	labels["CUSTOMER"] = "Google"
+// 	labels["SHORTCODE"] = "Goo"
+// 	labels["PATH"] = "/some/path/to/awesomeness"
+// 	labels["RANDOM"] = "whatDoYouNeedHere?"
+
+// 	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
+// 	newError.Operation = op
+// 	newError.Labels = labels
+
+// 	logger.ERROR(*newError, "transaction")
+
+// 	newError2 := BadEmailOrPassword(nil)
+// 	op.First = false
+// 	op.Last = true
+// 	newError2.Operation = op
+// 	newError2.Labels = labels
+
+// 	logger.ERROR(*newError2, "transaction")
+// 	time.Sleep(time.Second * 5)
 // }
-func CloudShipping(t *testing.T) {
-	err, logger := Init(&LoggingConfig{
-		ProjectID:     "heroic-truck-168212",
-		DefaultLogTag: "general",
-		Logs:          []string{"transaction", "error", "activity"},
-		WithTrace:     true,
-		TraceAsJSON:   false,
-		SimpleTrace:   true,
-		Debug:         true,
-		Type:          "google",
-	})
-
-	//log.Println(logger)
-
-	if err != nil {
-		panic(err)
-	}
-
-	op := Operation{
-		Producer: "GET: /some/path/to/awesomeness",
-		ID:       "123123jb123b12",
-		First:    true,
-		Last:     false,
-	}
-	labels := make(map[string]string)
-	labels["CUSTOMER"] = "Google"
-	labels["SHORTCODE"] = "Goo"
-	labels["PATH"] = "/some/path/to/awesomeness"
-	labels["RANDOM"] = "whatDoYouNeedHere?"
-
-	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
-	newError.Operation = op
-	newError.Labels = labels
-
-	logger.ERROR(*newError, "transaction")
-
-	newError2 := BadEmailOrPassword(nil)
-	op.First = false
-	op.Last = true
-	newError2.Operation = op
-	newError2.Labels = labels
-
-	logger.ERROR(*newError2, "transaction")
-	time.Sleep(time.Second * 5)
-
-}
 
 func TestOperationChain(t *testing.T) {
 	err, logger := Init(&LoggingConfig{
 		DefaultLogTag: "general",
 		WithTrace:     true,
-		TraceAsJSON:   false,
 		SimpleTrace:   true,
-		Debug:         true,
+		PrettyPrint:   true,
+		Colors:        true,
 		Type:          "stdout",
 	})
 
@@ -136,24 +103,13 @@ func TestOperationChain(t *testing.T) {
 	logger.LogOperationChain(op.ID)
 }
 func TestStdOutShipping(t *testing.T) {
-
-	//time.Sleep(time.Second * 10)
-	s3()
-	// time.Sleep(time.Second * 5)
-}
-func s3() {
-	s2()
-}
-func s2() {
-	s1()
-}
-func s1() {
-	err, logger := Init(&LoggingConfig{
+	var err error
+	err, GlobalLogger = Init(&LoggingConfig{
 		DefaultLogTag: "general",
 		WithTrace:     true,
-		TraceAsJSON:   false,
 		SimpleTrace:   true,
-		Debug:         true,
+		PrettyPrint:   true,
+		Colors:        true,
 		Type:          "stdout",
 	})
 
@@ -161,33 +117,46 @@ func s1() {
 		panic(err)
 	}
 
-	op := Operation{
-		Producer: "requestid or namespace or anything really..",
-		ID:       "123123jb123b12",
+	firstFunction()
+}
+func firstFunction() {
+	secondFunction()
+}
+
+func secondFunction() {
+	logX := GenericMessage("x")
+	logX.Labels = make(map[string]string)
+	logX.Labels["ID"] = "234234-324234-23423-4234234"
+
+	logX.Operation = Operation{
+		Producer: "/api/v1/getSomething",
+		ID:       "22342343",
 		First:    true,
 		Last:     false,
 	}
-	labels := make(map[string]string)
-	labels["CUSTOMER"] = "Google"
-	labels["SHORTCODE"] = "Goo"
-	labels["PATH"] = "/some/path/to/awesomeness"
-	labels["RANDOM"] = "whatDoYouNeedHere?"
 
-	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
-	newError.Operation = op
-	newError.Labels = labels
+	logX.Log("user-get", "INFO")
+	problemFunction()
+}
 
-	logger.ERROR(*newError, "my-custom-log-tag")
+var GlobalLogger *Logger
+var errorX *InformationConstruct
 
-	//newError2 := BadEmailOrPassword(nil)
-	//op.First = false
-	//op.Last = true
-	//newError2.Operation = op
-	//newError2.Labels = labels
+func problemFunction() {
 
-	//LogERROR(*newError2, "my-custom-log-tag2")
+	errorX := GenericErrorWithMessage(nil, "Problem Function is missbehaving")
+	errorX.Labels = make(map[string]string)
+	errorX.Labels["CUSTOMER"] = "Google"
+	errorX.Labels["SHORTCODE"] = "Goo"
+	errorX.Labels["PATH"] = "/some/path/to/awesomeness"
+	errorX.Labels["RANDOM"] = "AnythingYouWantBaby"
 
-	// redirect stdout to file?
-	// read file and compare..
-	// delete file ..
+	errorX.Operation = Operation{
+		Producer: "/api/v1/getSomething",
+		ID:       "22342343",
+		First:    false,
+		Last:     true,
+	}
+
+	errorX.Log("user-error", "ERROR")
 }

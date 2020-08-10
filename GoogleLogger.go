@@ -40,7 +40,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 				object.Operation = Operation{ID: uuid.New().String()}
 				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
 			}
-			object.print(logTag, severity, g.Config.Debug)
+			object.print(logTag, severity, g.Config.PrettyPrint)
 		}
 	}(object, severity, logTag)
 	// set the stack trace

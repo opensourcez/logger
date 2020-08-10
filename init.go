@@ -2,7 +2,6 @@ package logger
 
 import (
 	"log"
-	"time"
 )
 
 var internalLogger *Logger
@@ -12,7 +11,6 @@ func NewObject(message string, HTTPCode int) InformationConstruct {
 	return InformationConstruct{
 		Message:        message,
 		HTTPCode:       HTTPCode,
-		Timestamp:      int32(time.Now().Unix()),
 		Temporary:      false,
 		ReturnToClient: false,
 	}

@@ -1,9 +1,10 @@
 package logger
 
 import (
-	"encoding/json"
 	"runtime/debug"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 func GetSimpleStack(asJSON bool) (string, error) {
@@ -26,22 +27,18 @@ func GetSimpleStack(asJSON bool) (string, error) {
 			if len(splitFunc) <= 1 {
 				continue
 			}
-			stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"():"+currentLine)
+			if internalLogger.Config.Colors {
+				stackTrace = append(stackTrace, color.GreenString(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ")+currentLine)
+			} else {
+				stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): "+currentLine)
+			}
 			count++
 		}
 	}
 
 	var finalStack string
-	stackTrace = append(stackTrace[:0], stackTrace[0+6:]...)
-	if asJSON {
-		jsonSTACK, err := json.Marshal(stackTrace)
-		if err != nil {
-			return "", err
-		}
-		finalStack = string(jsonSTACK)
-	} else {
-		finalStack = strings.Join(stackTrace, "\n")
-	}
+	stackTrace = append(stackTrace[:0], stackTrace[0+4:]...)
+	finalStack = strings.Join(stackTrace, "\n")
 
 	return finalStack, nil
 }
@@ -49,20 +46,6 @@ func GetSimpleStack(asJSON bool) (string, error) {
 func GetStack(config *LoggingConfig, object *InformationConstruct) (err error) {
 
 	if config.WithTrace {
-		if config.TraceAsJSON {
-			if config.SimpleTrace {
-				stacktrace, err := GetSimpleStack(true)
-				if err != nil {
-					return err
-				}
-				object.StackTrace = stacktrace
-				return nil
-			}
-			stacktrace := string(debug.Stack())
-			object.StackTrace = stacktrace
-			return
-
-		}
 		if config.SimpleTrace {
 			stacktrace, err := GetSimpleStack(false)
 			if err != nil {
