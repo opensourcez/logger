@@ -51,12 +51,13 @@ import (
 
 func TestOperationChain(t *testing.T) {
 	err, logger := Init(&LoggingConfig{
-		DefaultLogTag: "general",
-		WithTrace:     true,
-		SimpleTrace:   true,
-		PrettyPrint:   true,
-		Colors:        true,
-		Type:          "stdout",
+		DefaultLogTag:   "testing-chains",
+		DefaultLogLevel: logLevelInfo,
+		WithTrace:       true,
+		SimpleTrace:     true,
+		PrettyPrint:     true,
+		Colors:          true,
+		Type:            "stdout",
 	})
 
 	if err != nil {
@@ -75,7 +76,7 @@ func TestOperationChain(t *testing.T) {
 	newError.Labels = make(map[string]string)
 	newError.Labels["Key"] = "value for error 1"
 	newError.LogLevel = "INFO"
-	logger.AddToChain(newError.Operation.ID, *newError)
+	newError.AddToChain()
 
 	op.First = false
 	newError = GenericErrorWithMessage(nil, "Error2")
@@ -83,14 +84,14 @@ func TestOperationChain(t *testing.T) {
 	newError.Labels = make(map[string]string)
 	newError.Labels["Key"] = "value for error 2"
 	newError.LogLevel = "ERROR"
-	logger.AddToChain(newError.Operation.ID, *newError)
+	newError.AddToChain()
 
 	newError = GenericErrorWithMessage(nil, "Error3")
 	newError.Operation = op
 	newError.Labels = make(map[string]string)
 	newError.Labels["Key"] = "value for error 3"
 	newError.LogLevel = "EMERGENCY"
-	logger.AddToChain(newError.Operation.ID, *newError)
+	newError.AddToChain()
 
 	op.Last = true
 	newError = GenericErrorWithMessage(nil, "Error4")
@@ -98,19 +99,20 @@ func TestOperationChain(t *testing.T) {
 	newError.Labels = make(map[string]string)
 	newError.Labels["Key"] = "value for error 4"
 	newError.LogLevel = "EMERGENCY"
-	logger.AddToChain(newError.Operation.ID, *newError)
+	newError.AddToChain()
 
 	logger.LogOperationChain(op.ID)
 }
 func TestStdOutShipping(t *testing.T) {
 	var err error
 	err, GlobalLogger = Init(&LoggingConfig{
-		DefaultLogTag: "general",
-		WithTrace:     true,
-		SimpleTrace:   true,
-		PrettyPrint:   true,
-		Colors:        true,
-		Type:          "stdout",
+		DefaultLogTag:   "testing-logs",
+		DefaultLogLevel: logLevelInfo,
+		WithTrace:       true,
+		SimpleTrace:     true,
+		PrettyPrint:     true,
+		Colors:          true,
+		Type:            "stdout",
 	})
 
 	if err != nil {
@@ -125,6 +127,7 @@ func firstFunction() {
 
 func secondFunction() {
 	logX := GenericMessage("x")
+	logX.LogLevel = logLevelNotice
 	logX.Labels = make(map[string]string)
 	logX.Labels["ID"] = "234234-324234-23423-4234234"
 
@@ -135,7 +138,7 @@ func secondFunction() {
 		Last:     false,
 	}
 
-	logX.Log("user-get", "INFO")
+	logX.Log()
 	problemFunction()
 }
 
@@ -145,6 +148,7 @@ var errorX *InformationConstruct
 func problemFunction() {
 
 	errorX := GenericErrorWithMessage(nil, "Problem Function is missbehaving")
+	errorX.LogLevel = logLevelError
 	errorX.Labels = make(map[string]string)
 	errorX.Labels["CUSTOMER"] = "Google"
 	errorX.Labels["SHORTCODE"] = "Goo"
@@ -158,5 +162,5 @@ func problemFunction() {
 		Last:     true,
 	}
 
-	errorX.Log("user-error", "ERROR")
+	errorX.Log()
 }

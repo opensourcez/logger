@@ -40,7 +40,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 				object.Operation = Operation{ID: uuid.New().String()}
 				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
 			}
-			object.print(logTag, severity, g.Config.PrettyPrint)
+			object.log()
 		}
 	}(object, severity, logTag)
 	// set the stack trace
@@ -74,6 +74,9 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 		}})
 }
 
+func (g *GoogleClient) close() {
+	g.Client.Close()
+}
 func getSeverity(severity string) logging.Severity {
 	switch severity {
 	case "EMERGENCY":
@@ -93,8 +96,4 @@ func getSeverity(severity string) logging.Severity {
 	default:
 		return logging.Info
 	}
-}
-
-func (g *GoogleClient) close() {
-	g.Client.Close()
 }

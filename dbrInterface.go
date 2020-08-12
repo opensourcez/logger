@@ -20,9 +20,9 @@ func (d *DBREventReceiver) Event(eventName string) {
 		event.LogTag = d.LogTag
 		event.Operation = Operation{ID: d.OPID}
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
 	}
 }
@@ -38,9 +38,9 @@ func (d *DBREventReceiver) EventKv(eventName string, kvs map[string]string) {
 		event.Operation = Operation{ID: d.OPID}
 		event.LogTag = d.LogTag
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
 	}
 }
@@ -55,10 +55,11 @@ func (d *DBREventReceiver) EventErr(eventName string, err error) error {
 	event.LogTag = d.LogTag
 	if d.ShowErrors {
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
+
 	}
 	return event
 }
@@ -75,10 +76,11 @@ func (d *DBREventReceiver) EventErrKv(eventName string, err error, kvs map[strin
 	event.LogTag = d.LogTag
 	if d.ShowErrors {
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
+
 	}
 	return event
 }
@@ -93,10 +95,11 @@ func (d *DBREventReceiver) Timing(eventName string, nanoseconds int64) {
 		event.Operation = Operation{ID: d.OPID}
 		event.LogTag = d.LogTag
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
+
 	}
 }
 
@@ -111,9 +114,10 @@ func (d *DBREventReceiver) TimingKv(eventName string, nanoseconds int64, kvs map
 		event.LogLevel = "INFO"
 		event.LogTag = d.LogTag
 		if d.AddToChain {
-			internalLogger.AddToChain(d.OPID, *event)
+			event.AddToChain()
 		} else {
-			internalLogger.INFO(*event, d.LogTag)
+			event.Log()
 		}
+
 	}
 }

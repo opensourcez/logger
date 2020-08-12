@@ -1,6 +1,16 @@
 package logger
 
 const (
+	logLevelEmergency = "EMERGENCY"
+	logLevelError     = "ERROR"
+	logLevelCritical  = "CRITICAL"
+	logLevelAlert     = "ALERT"
+	logLevelWarning   = "WARNING"
+	logLevelNotice    = "NOTICE"
+	logLevelInfo      = "INFO"
+)
+
+const (
 	// examples, we need NewObject codes.
 	CodeTransactionCanceled = 1003
 	CodeTransactionFailed   = 1002

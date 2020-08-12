@@ -69,55 +69,26 @@ func GetHTTPCode(err error) int {
 	return 0
 }
 
-func (l *Logger) ERROR(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "ERROR"
-	l.logit(&construct, logTag, "ERROR")
-}
-func (l *Logger) EMERGENCY(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "EMERGENCY"
-	l.logit(&construct, logTag, "EMERGENCY")
-}
-func (l *Logger) CRITICAL(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "CRITICAL"
-	l.logit(&construct, logTag, "CRITICAL")
-}
-func (l *Logger) ALERT(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "ALERT"
-	l.logit(&construct, logTag, "ALERT")
-}
-func (l *Logger) WARNING(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "WARNING"
-	l.logit(&construct, logTag, "WARNING")
-}
-func (l *Logger) NOTICE(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "NOTICE"
-	l.logit(&construct, logTag, "NOTICE")
-}
-func (l *Logger) INFO(construct InformationConstruct, logTag string) {
-	construct.LogLevel = "INFO"
-	l.logit(&construct, logTag, "INFO")
-}
-
-func (l *Logger) logit(construct *InformationConstruct, logTag string, severity string) {
-	l.checklogTag(&logTag)
-	l.Client.log(construct, severity, logTag)
-}
-
-func (e *InformationConstruct) Log(logTag string, severity string) {
-	e.LogLevel = severity
+func (e *InformationConstruct) Log() {
 	if e.StackTrace == "" {
 		err := GetStack(internalLogger.Config, e)
 		if err != nil {
 			e.StackTrace = "Could not get stacktrace, error:" + err.Error()
 		}
 	}
+	if e.LogTag == "" {
+		e.LogTag = internalLogger.Config.DefaultLogTag
+	}
+	if e.LogLevel == "" {
+		e.LogLevel = internalLogger.Config.DefaultLogLevel
+	}
 	e.Timestamp = time.Now().Unix()
-	e.print(logTag, severity, internalLogger.Config.PrettyPrint)
+	e.log()
 }
 
-func (e *InformationConstruct) print(logTag string, severity string, pretty bool) {
+func (e *InformationConstruct) log() {
 
-	if pretty {
+	if internalLogger.Config.PrettyPrint {
 		// if we do not have an opperation we add one.
 		if e.Operation.ID == "" {
 			e.Operation = Operation{ID: uuid.New().String(), Producer: "Debug logger", First: true, Last: true}
@@ -199,11 +170,11 @@ func (e *InformationConstruct) print(logTag string, severity string, pretty bool
 		e.Message = ""
 	}
 	if internalLogger.Config.Colors {
-		log.Println(color.YellowString(severity), color.YellowString(logTag), color.GreenString(e.JSON()))
+		log.Println(color.YellowString(e.LogLevel), color.YellowString(e.LogTag), color.GreenString(e.JSON()))
 	} else {
 		fmt.Println(e.JSON())
 	}
-	if pretty {
+	if internalLogger.Config.PrettyPrint {
 		if internalLogger.Config.Colors {
 			fmt.Println(color.MagentaString("=========================="))
 		} else {
@@ -212,22 +183,15 @@ func (e *InformationConstruct) print(logTag string, severity string, pretty bool
 	}
 
 }
-
-func (l *Logger) AddToChain(id string, logItem InformationConstruct) {
-	l.Lock()
-	defer l.Unlock()
-	_ = GetStack(l.Config, &logItem)
-	l.Chain[id] = append(l.Chain[id], logItem)
+func (e *InformationConstruct) AddToChain() {
+	internalLogger.Chain[e.Operation.ID] = append(internalLogger.Chain[e.Operation.ID], *e)
 }
+
 func (l *Logger) LogOperationChain(id string) {
 	l.Lock()
 	defer l.Unlock()
 	for _, v := range l.Chain[id] {
-		if v.LogLevel == "" {
-			v.LogLevel = "INFO"
-		}
-
-		l.logit(&v, v.LogLevel, v.LogTag)
+		v.Log()
 	}
 	delete(l.Chain, id)
 }

@@ -48,16 +48,12 @@ func Init(config *LoggingConfig) (err error, l *Logger) {
 		err = client.new(config)
 		l.Client = &client
 		break
-	case "crashguard":
-		log.Println("CrashGuard logger has not been implemented yet")
 	case "stdout":
 		client := StdClient{}
 		err = client.new(config)
 		l.Client = &client
 	case "aws":
-		log.Println("aws logger has not been implemented yet")
-	case "file":
-		log.Println("File logging should be handled by you os <3")
+		log.Println("todo ...")
 	default:
 		client := StdClient{}
 		err = client.new(config)

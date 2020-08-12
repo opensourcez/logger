@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"os"
-
 	gclogging "cloud.google.com/go/logging"
 	"github.com/zkynetio/safelocker"
 )
@@ -19,7 +17,6 @@ type Logger struct {
 // LoggingClient ...
 type LoggingClient interface {
 	new(config *LoggingConfig) error
-	log(object *InformationConstruct, severity string, logTag string)
 	close()
 }
 
@@ -30,22 +27,35 @@ type GoogleClient struct {
 	Client  *gclogging.Client
 }
 
-// CrashGuardClient ...
-type CrashGuardClient struct {
-	Config *LoggingConfig
-}
-
 // StdClient ...
 type StdClient struct {
 	Loggers map[string]string
 	Config  *LoggingConfig
 }
-type FileClient struct {
-	BaseLogFolder          string
-	fileChannels           map[string]chan []byte
-	BaseLogFilePermissions os.FileMode // default is 0660
-	Loggers                map[string]string
-	Config                 *LoggingConfig
+
+// LoggingConfig ...
+type LoggingConfig struct {
+	// Enable or disable colors
+	Colors bool
+	// The type of logging config.
+	// 1. stdout
+	// 2. .. in development
+	Type string
+	// The default tag used for your logs.
+	DefaultLogTag string
+	// The default log level
+	DefaultLogLevel string
+	// Do you want a stack trace with your log ?
+	WithTrace bool
+	// Do you want the simplified stack trace or the default one ?
+	SimpleTrace bool
+	// Enable pretty printing in the console
+	PrettyPrint bool
+	// Only used for Type:google
+	ProjectID string
+
+	// This field is only for google cloud logging, which is still in development
+	Logs []string
 }
 
 // InformationConstruct ...
@@ -94,28 +104,6 @@ type InformationConstruct struct {
 	QueryTiming int64 `json:"QueryTiming,omitempty" xml:"QueryTiming"`
 	// The current session
 	Session string `json:"Session,omitempty" xml:"Session"`
-}
-
-// LoggingConfig ...
-type LoggingConfig struct {
-	// Enable or disable colors
-	Colors bool
-	// The type of logging config.
-	// 1. stdout
-	Type string
-	// The default tag used for your logs.
-	DefaultLogTag string
-	// Do you want a stack trace with your log ?
-	WithTrace bool
-	// Do you want the simplified stack trace or the default one ?
-	SimpleTrace bool
-	// Enable pretty printing in the console
-	PrettyPrint bool
-	// Only used for Type:google
-	ProjectID string
-
-	// This field is only for google cloud logging, which is still in development
-	Logs []string
 }
 
 // Operation ...
