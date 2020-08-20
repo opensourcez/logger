@@ -52,7 +52,7 @@ import (
 func TestOperationChain(t *testing.T) {
 	err, logger := Init(&LoggingConfig{
 		DefaultLogTag:   "testing-chains",
-		DefaultLogLevel: logLevelInfo,
+		DefaultLogLevel: LogLevelInfo,
 		WithTrace:       true,
 		SimpleTrace:     true,
 		PrettyPrint:     true,
@@ -107,7 +107,7 @@ func TestStdOutShipping(t *testing.T) {
 	var err error
 	err, GlobalLogger = Init(&LoggingConfig{
 		DefaultLogTag:   "testing-logs",
-		DefaultLogLevel: logLevelInfo,
+		DefaultLogLevel: LogLevelInfo,
 		WithTrace:       true,
 		SimpleTrace:     true,
 		PrettyPrint:     true,
@@ -127,7 +127,7 @@ func firstFunction() {
 
 func secondFunction() {
 	logX := GenericMessage("x")
-	logX.LogLevel = logLevelNotice
+	logX.LogLevel = LogLevelNotice
 	logX.Labels = make(map[string]string)
 	logX.Labels["ID"] = "234234-324234-23423-4234234"
 
@@ -148,7 +148,7 @@ var errorX *InformationConstruct
 func problemFunction() {
 
 	errorX := GenericErrorWithMessage(nil, "Problem Function is missbehaving")
-	errorX.LogLevel = logLevelError
+	errorX.LogLevel = LogLevelError
 	errorX.Labels = make(map[string]string)
 	errorX.Labels["CUSTOMER"] = "Google"
 	errorX.Labels["SHORTCODE"] = "Goo"

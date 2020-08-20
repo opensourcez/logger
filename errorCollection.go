@@ -1,13 +1,13 @@
 package logger
 
 const (
-	logLevelEmergency = "EMERGENCY"
-	logLevelError     = "ERROR"
-	logLevelCritical  = "CRITICAL"
-	logLevelAlert     = "ALERT"
-	logLevelWarning   = "WARNING"
-	logLevelNotice    = "NOTICE"
-	logLevelInfo      = "INFO"
+	LogLevelEmergency = "EMERGENCY"
+	LogLevelError     = "ERROR"
+	LogLevelCritical  = "CRITICAL"
+	LogLevelAlert     = "ALERT"
+	LogLevelWarning   = "WARNING"
+	LogLevelNotice    = "NOTICE"
+	LogLevelInfo      = "INFO"
 )
 
 const (
