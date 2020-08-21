@@ -65,6 +65,11 @@ func ParsePGError(er error) (outError *InformationConstruct) {
 		outError = BadRequest(err, err.Routine)
 		outError.Message = err.Message
 		outError.Code = "42701"
+	case "42P18":
+		outError = BadRequest(err, err.Routine)
+		outError.Message = err.Message
+		outError.Code = "42P18"
+		outError.Hint = "Some of your query parameters might be invalid."
 	default:
 		// this is  away to catch errors that are not supported.
 		// so that they can be added.
