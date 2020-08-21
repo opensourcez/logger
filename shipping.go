@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -125,6 +126,12 @@ func (e *InformationConstruct) log() {
 			logString = logString + "MSG: " + e.Message + "\n"
 		}
 
+		if e.QueryTimingString != "" {
+			logString = logString + "QueryTiming: " + e.QueryTimingString + "\n"
+		}
+		if e.QueryTiming != 0 {
+			logString = logString + "QueryTiming: " + strconv.FormatInt(e.QueryTiming, 10) + "\n"
+		}
 		if e.Query != "" {
 			logString = logString + "Query: " + e.Query + "\n"
 		}

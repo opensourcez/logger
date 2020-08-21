@@ -101,7 +101,8 @@ type InformationConstruct struct {
 	// If a database query or any kind of search parameters were in play they can be placed here.
 	Query string `json:"Query,omitempty" xml:"Query"`
 	// The timing of the before mentioned query
-	QueryTiming int64 `json:"QueryTiming,omitempty" xml:"QueryTiming"`
+	QueryTiming       int64  `json:"QueryTiming,omitempty" xml:"QueryTiming"`
+	QueryTimingString string `json:"QueryTimingString,omitempty" xml:"QueryTimingString"`
 	// The current session
 	Session string `json:"Session,omitempty" xml:"Session"`
 }
