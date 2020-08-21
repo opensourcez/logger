@@ -11,16 +11,19 @@ import (
 )
 
 func ParsePGError(er error) (outError *InformationConstruct) {
-	ispgerror := false
+	if er == nil {
+		return nil
+	}
 	switch er.(type) {
 	case *pgx.Error:
-		ispgerror = true
 	default:
-		return GenericError(er)
+		// some errors are going to get triggered here...
+		newErr := GenericError(er)
+		newErr.Message = er.Error()
+		newErr.HTTPCode = 404
+		return newErr
 	}
-	if !ispgerror {
-		return GenericError(er)
-	}
+
 	err := er.(*pgx.Error)
 	switch err.Code {
 	case "42702":
