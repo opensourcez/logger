@@ -19,7 +19,9 @@ func GetSimpleStack(asJSON bool) (string, error) {
 			if lineNumberIndex > len(stackSplit)-1 {
 				continue
 			}
-			currentLine = strings.Split(strings.Split(stackSplit[lineNumberIndex], ":")[1], " ")[0]
+			stackSplit[lineNumberIndex] = stackSplit[lineNumberIndex][1:]
+			currentLine = strings.Replace(strings.Split(stackSplit[lineNumberIndex], " ")[0], "\t", "", 0)
+
 		}
 
 		if (i % 2) == 1 {
