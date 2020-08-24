@@ -171,10 +171,10 @@ func (e *InformationConstruct) log() {
 
 		fmt.Println(logString)
 		// Remove fields we have already displayed
-		e.StackTrace = ""
-		e.Query = ""
-		e.Hint = ""
-		e.Message = ""
+		// e.StackTrace = ""
+		// e.Query = ""
+		// e.Hint = ""
+		// e.Message = ""
 	}
 	if internalLogger.Config.Colors {
 		log.Println(color.YellowString(e.LogLevel), color.YellowString(e.LogTag), color.GreenString(e.JSON()))
