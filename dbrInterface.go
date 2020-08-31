@@ -47,7 +47,7 @@ func (d *DBREventReceiver) EventKv(eventName string, kvs map[string]string) {
 
 // EventErr receives a notification of an error if one occurs.
 func (d *DBREventReceiver) EventErr(eventName string, err error) error {
-	event := ParsePGError(err)
+	event := ParseDBError(err)
 	event.Query = eventName
 	event.LogLevel = "ERROR"
 	event.Message = err.Error()
@@ -67,7 +67,7 @@ func (d *DBREventReceiver) EventErr(eventName string, err error) error {
 // EventErrKv receives a notification of an error if one occurs along with
 // optional key/value data.
 func (d *DBREventReceiver) EventErrKv(eventName string, err error, kvs map[string]string) error {
-	event := ParsePGError(err)
+	event := ParseDBError(err)
 	event.Query = eventName
 	event.Labels = kvs
 	event.Operation = Operation{ID: d.OPID}

@@ -10,21 +10,7 @@ import (
 	pgx "github.com/lib/pq"
 )
 
-func ParsePGError(er error) (outError *InformationConstruct) {
-	if er == nil {
-		return nil
-	}
-	switch er.(type) {
-	case *pgx.Error:
-	default:
-		// some errors are going to get triggered here...
-		newErr := GenericError(er)
-		newErr.Message = er.Error()
-		newErr.HTTPCode = 404
-		return newErr
-	}
-
-	err := er.(*pgx.Error)
+func ParsePG(err *pgx.Error) (outError *InformationConstruct) {
 	switch err.Code {
 	case "42702":
 		outError = BadRequest(err, err.Detail)
@@ -75,6 +61,25 @@ func ParsePGError(er error) (outError *InformationConstruct) {
 		// so that they can be added.
 		PrintObject(err)
 	}
+	return
+}
+func ParseDBError(er error) (outError *InformationConstruct) {
+	if er == nil {
+		return nil
+	}
+	switch er.(type) {
+	case *pgx.Error:
+		outError = ParsePG(er.(*pgx.Error))
+	// case "sql":
+	// todo for emil
+	default:
+		// some errors are going to get triggered here...
+		newErr := GenericError(er)
+		newErr.Message = er.Error()
+		newErr.HTTPCode = 404
+		return newErr
+	}
+
 	return
 }
 func PrintObject(Object interface{}) {
