@@ -120,13 +120,10 @@ func ParseDBError(er error) (outError *InformationConstruct) {
 		return nil
 	}
 
-	fmt.Println(er)
-
 	switch er.(type) {
 	case *pgx.Error:
 		outError = ParsePG(er.(*pgx.Error))
 	case *msql.MySQLError:
-		// todo for emil
 		outError = ParseSQL(er.(*msql.MySQLError))
 	default:
 		// some errors are going to get triggered here...
