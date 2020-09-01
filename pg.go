@@ -105,6 +105,8 @@ func ParseSQL(err *msql.MySQLError) (outError *InformationConstruct) {
 		PrintObject(err)
 	}
 
+	return
+
 }
 
 func ParseDBError(er error) (outError *InformationConstruct) {
