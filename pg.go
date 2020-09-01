@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	msql "github.com/go-sql-driver/mysql"
 	pgx "github.com/lib/pq"
 )
 
@@ -63,15 +64,26 @@ func ParsePG(err *pgx.Error) (outError *InformationConstruct) {
 	}
 	return
 }
+
+func ParseSQL() {
+
+	//
+
+}
+
 func ParseDBError(er error) (outError *InformationConstruct) {
 	if er == nil {
 		return nil
 	}
+
+	fmt.Println(er)
+
 	switch er.(type) {
 	case *pgx.Error:
 		outError = ParsePG(er.(*pgx.Error))
-	// case "sql":
-	// todo for emil
+	case *msql.MySQLError:
+		// todo for emil
+		fmt.Println("hello world")
 	default:
 		// some errors are going to get triggered here...
 		newErr := GenericError(er)

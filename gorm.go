@@ -15,7 +15,9 @@ type GORMLogger struct {
 }
 
 func (g *GORMLogger) Print(value ...interface{}) {
+
 	if value[0] == "sql" {
+
 		newErr := GenericError(nil)
 		data := GetSQLString(value...)
 		newErr.Query = data[1].(string)
