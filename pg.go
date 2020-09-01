@@ -65,9 +65,45 @@ func ParsePG(err *pgx.Error) (outError *InformationConstruct) {
 	return
 }
 
-func ParseSQL() {
+// ParseSQL ...
+func ParseSQL(err *msql.MySQLError) (outError *InformationConstruct) {
 
-	//
+	switch err.Number {
+	// ambiguous col
+	case 1052:
+		outError = BadRequest(err, err.Message)
+		// outError.Hint = err.Hint
+		outError.Message = err.Message
+		outError.Code = "1052"
+	// NULL supplied to not null
+	case 1263:
+		outError = BadRequest(err, err.Message)
+		// outError.Hint = err.Hint
+		outError.Message = err.Message
+		outError.Code = "1263"
+	// 	Can't write, because of unique constraint, to table '%s'
+	case 1169:
+		outError = BadRequest(err, err.Message)
+		outError.Message = err.Message
+		outError.Code = "1169"
+	// Can’t connect to local MySQL server through socket ‘/var/run/mysqld/mysqld.sock’ (2)”
+	case 2002:
+		outError = BadRequest(err, err.Message)
+		outError.Message = err.Message
+		outError.Code = "2002"
+	// Access denied for user '%s'@'%s' to database '%s'
+	case 1044:
+		outError = BadRequest(err, err.Message)
+		outError.Message = err.Message
+		outError.Code = "1044"
+	// Unknown table '%s'
+	case 1051:
+		outError = BadRequest(err, err.Message)
+		outError.Message = err.Message
+		outError.Code = "1051"
+	default:
+		PrintObject(err)
+	}
 
 }
 
