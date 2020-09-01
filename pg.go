@@ -101,6 +101,12 @@ func ParseSQL(err *msql.MySQLError) (outError *InformationConstruct) {
 		outError = BadRequest(err, err.Message)
 		outError.Message = err.Message
 		outError.Code = "1051"
+	// Incorrect table name
+	case 1103:
+		outError = BadRequest(err, err.Message)
+		outError.Hint = "Incorrect table name"
+		outError.Message = err.Message
+		outError.Code = "1051"
 	default:
 		PrintObject(err)
 	}
