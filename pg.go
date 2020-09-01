@@ -11,6 +11,7 @@ import (
 	pgx "github.com/lib/pq"
 )
 
+// ParsePG ...
 func ParsePG(err *pgx.Error) (outError *InformationConstruct) {
 	switch err.Code {
 	case "42702":
@@ -115,6 +116,7 @@ func ParseSQL(err *msql.MySQLError) (outError *InformationConstruct) {
 
 }
 
+// ParseDBError ...
 func ParseDBError(er error) (outError *InformationConstruct) {
 	if er == nil {
 		return nil
@@ -135,6 +137,8 @@ func ParseDBError(er error) (outError *InformationConstruct) {
 
 	return
 }
+
+// PrintObject ...
 func PrintObject(Object interface{}) {
 	fields := reflect.TypeOf(Object).Elem()
 	values := reflect.ValueOf(Object).Elem()
