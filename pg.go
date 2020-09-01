@@ -121,7 +121,7 @@ func ParseDBError(er error) (outError *InformationConstruct) {
 		outError = ParsePG(er.(*pgx.Error))
 	case *msql.MySQLError:
 		// todo for emil
-		fmt.Println("hello world")
+		outError = ParseSQL(er.(*msql.MySQLError))
 	default:
 		// some errors are going to get triggered here...
 		newErr := GenericError(er)
