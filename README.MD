@@ -1,4 +1,4 @@
-# ZkynetIO logger
+# logger
 <img src="gopher.png" alt="drawing" width="250"/>
 
 # Usage
