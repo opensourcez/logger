@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fatih/color"
@@ -194,16 +195,18 @@ func (e *InformationConstruct) AddToChain() {
 	internalLogger.Chain[e.Operation.ID] = append(internalLogger.Chain[e.Operation.ID], *e)
 }
 
+var ChainMutex = sync.Mutex{}
+
 func (l *Logger) LogOperationChain(id string) {
-	l.Lock()
-	defer l.Unlock()
+	ChainMutex.Lock()
+	defer ChainMutex.Unlock()
 	for _, v := range l.Chain[id] {
 		v.Log()
 	}
 	delete(l.Chain, id)
 }
 func (l *Logger) DeleteChain(id string) {
-	l.Lock()
-	defer l.Unlock()
+	ChainMutex.Lock()
+	defer ChainMutex.Unlock()
 	delete(l.Chain, id)
 }

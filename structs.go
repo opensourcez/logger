@@ -2,7 +2,6 @@ package logger
 
 import (
 	gclogging "cloud.google.com/go/logging"
-	"github.com/zkynetio/safelocker"
 )
 
 // Logger ...
@@ -10,8 +9,7 @@ import (
 type Logger struct {
 	Config *LoggingConfig
 	Client LoggingClient
-	safelocker.SafeLocker
-	Chain map[string][]InformationConstruct
+	Chain  map[string][]InformationConstruct
 }
 
 // LoggingClient ...
