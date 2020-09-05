@@ -13,7 +13,8 @@ func GetSimpleStack(asJSON bool) (string, error) {
 	var stackTrace []string
 	count := 0
 
-	var currentLine string
+	// var currentLine string
+	var fileAndLineSplit []string
 	for i, v := range stackSplit {
 		if (i % 2) == 0 {
 			lineNumberIndex := i + 2
@@ -21,8 +22,8 @@ func GetSimpleStack(asJSON bool) (string, error) {
 				continue
 			}
 			stackSplit[lineNumberIndex] = stackSplit[lineNumberIndex][1:]
-			currentLine = strings.Replace(strings.Split(stackSplit[lineNumberIndex], " ")[0], "\t", "", 0)
-
+			// currentLine = )
+			fileAndLineSplit = strings.Split(strings.Replace(strings.Split(stackSplit[lineNumberIndex], " ")[0], "\t", "", -1), ":")
 		}
 
 		if (i % 2) == 1 {
@@ -30,11 +31,20 @@ func GetSimpleStack(asJSON bool) (string, error) {
 			if len(splitFunc) <= 1 {
 				continue
 			}
-			if internalLogger.Config.Colors {
-				stackTrace = append(stackTrace, color.Green(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ").String()+currentLine)
+			if internalLogger.Config.FilesInStack {
+				if internalLogger.Config.Colors {
+					stackTrace = append(stackTrace, color.Green(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ").String()+fileAndLineSplit[1]+":"+fileAndLineSplit[2])
+				} else {
+					stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): "+fileAndLineSplit[1]+":"+fileAndLineSplit[2])
+				}
 			} else {
-				stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): "+currentLine)
+				if internalLogger.Config.Colors {
+					stackTrace = append(stackTrace, color.Green(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ").String()+fileAndLineSplit[2])
+				} else {
+					stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): "+fileAndLineSplit[2])
+				}
 			}
+
 			count++
 		}
 	}

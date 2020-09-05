@@ -49,6 +49,8 @@ type LoggingConfig struct {
 	SimpleTrace bool
 	// Enable pretty printing in the console
 	PrettyPrint bool
+	// Include file names when logging
+	FilesInStack bool
 	// Only used for Type:google
 	ProjectID string
 

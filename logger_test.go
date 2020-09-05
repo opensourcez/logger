@@ -115,6 +115,7 @@ func TestStdOutShipping(t *testing.T) {
 		SimpleTrace:     true,
 		PrettyPrint:     true,
 		Colors:          true,
+		FilesInStack:    true,
 		Type:            "stdout",
 	})
 
@@ -169,7 +170,7 @@ func problemFunction() {
 	LogActuallyHappensHere(errorX)
 }
 func LogActuallyHappensHere(err *InformationConstruct) {
-	err.log()
+	err.Log()
 	PanicFunction()
 }
 func PanicFunction() {
