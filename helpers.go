@@ -5,9 +5,9 @@ import (
 	"log"
 )
 
-func GetRecoverError(r interface{}) (err error) {
+func TypeCastRecoverInterface(r interface{}) (err error) {
 	if r == nil {
-		return errors.New("no revocery detected..")
+		return errors.New("No recovery detected")
 	}
 	switch x := r.(type) {
 	case string:

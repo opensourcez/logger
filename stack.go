@@ -4,7 +4,8 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/fatih/color"
+	// "github.com/fatih/color"
+	color "github.com/logrusorgru/aurora"
 )
 
 func GetSimpleStack(asJSON bool) (string, error) {
@@ -30,7 +31,7 @@ func GetSimpleStack(asJSON bool) (string, error) {
 				continue
 			}
 			if internalLogger.Config.Colors {
-				stackTrace = append(stackTrace, color.GreenString(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ")+currentLine)
+				stackTrace = append(stackTrace, color.Green(splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): ").String()+currentLine)
 			} else {
 				stackTrace = append(stackTrace, splitFunc[0]+strings.Split(splitFunc[1], ")")[1]+"(): "+currentLine)
 			}
@@ -39,16 +40,16 @@ func GetSimpleStack(asJSON bool) (string, error) {
 	}
 
 	var finalStack string
-	stackTrace = append(stackTrace[:0], stackTrace[0+4:]...)
+	stackTrace = append(stackTrace[:0], stackTrace[0+3:]...)
 	finalStack = strings.Join(stackTrace, "\n")
 
 	return finalStack, nil
 }
 
-func GetStack(config *LoggingConfig, object *InformationConstruct) (err error) {
+func (object *InformationConstruct) Stack() (err error) {
 
-	if config.WithTrace {
-		if config.SimpleTrace {
+	if internalLogger.Config.WithTrace {
+		if internalLogger.Config.SimpleTrace {
 			stacktrace, err := GetSimpleStack(false)
 			if err != nil {
 				return err

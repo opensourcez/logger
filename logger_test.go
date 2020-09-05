@@ -64,6 +64,7 @@ func TestOperationChain(t *testing.T) {
 		panic(err)
 	}
 
+	// Operations are optional ...
 	op := Operation{
 		Producer: "requestid or namespace or anything really..",
 		ID:       "123123jb123b12",
@@ -71,7 +72,9 @@ func TestOperationChain(t *testing.T) {
 		Last:     false,
 	}
 
-	newError := GenericErrorWithMessage(nil, "Error1")
+	newError := &InformationConstruct{
+		Message: "Error1",
+	}
 	newError.Operation = op
 	newError.Labels = make(map[string]string)
 	newError.Labels["Key"] = "value for error 1"
@@ -162,5 +165,21 @@ func problemFunction() {
 		Last:     true,
 	}
 
-	errorX.Log()
+	errorX.Stack()
+	LogActuallyHappensHere(errorX)
+}
+func LogActuallyHappensHere(err *InformationConstruct) {
+	err.log()
+	PanicFunction()
+}
+func PanicFunction() {
+	defer func() {
+		if r := recover(); r != nil {
+			// 1. Create any error you want
+			// 2. Typecast the recover interface.
+			// 3. Log.
+			GenericError(TypeCastRecoverInterface(r)).Log()
+		}
+	}()
+	panic("we paniced here...")
 }

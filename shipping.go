@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/google/uuid"
+	color "github.com/logrusorgru/aurora"
 )
 
 func cleanInformationConstruct(str *InformationConstruct) {
@@ -73,7 +73,7 @@ func GetHTTPCode(err error) int {
 
 func (e *InformationConstruct) Log() {
 	if e.StackTrace == "" {
-		err := GetStack(internalLogger.Config, e)
+		err := e.Stack()
 		if err != nil {
 			e.StackTrace = "Could not get stacktrace, error:" + err.Error()
 		}
@@ -97,17 +97,17 @@ func (e *InformationConstruct) log() {
 		}
 		var logString string
 		if internalLogger.Config.Colors {
-			logString = color.MagentaString("============ DEBUG ENTRY ===================================\n")
+			logString = color.Magenta("============ DEBUG ENTRY ===================================\n").String()
 		} else {
 			logString = "============ DEBUG ENTRY ===================================\n"
 		}
 
 		if internalLogger.Config.Colors {
 			if e.Operation.First {
-				logString = logString + color.RedString("FIRST\n")
+				logString = logString + color.Red("FIRST\n").String()
 			}
 			if e.Operation.Last {
-				logString = logString + color.RedString("LAST\n")
+				logString = logString + color.Red("LAST\n").String()
 			}
 		} else {
 			logString = logString + "FIRST\n"
@@ -115,14 +115,14 @@ func (e *InformationConstruct) log() {
 
 		if internalLogger.Config.Colors {
 
-			logString = logString + "OPID: " + color.GreenString(e.Operation.ID) + "\n"
-			logString = logString + "PRODUCER: " + color.GreenString(e.Operation.Producer) + "\n"
+			logString = logString + "OPID: " + color.Green(e.Operation.ID).String() + "\n"
+			logString = logString + "PRODUCER: " + color.Green(e.Operation.Producer).String() + "\n"
 		} else {
 			logString = logString + "OPID: " + e.Operation.ID + "\n"
 			logString = logString + "OPID: " + e.Operation.Producer + "\n"
 		}
 		if internalLogger.Config.Colors {
-			logString = logString + "MSG: " + color.GreenString(e.Message) + "\n"
+			logString = logString + "MSG: " + color.Green(e.Message).String() + "\n"
 		} else {
 			logString = logString + "MSG: " + e.Message + "\n"
 		}
@@ -145,13 +145,13 @@ func (e *InformationConstruct) log() {
 		}
 		if e.Labels != nil {
 			if internalLogger.Config.Colors {
-				logString = logString + color.YellowString("---------- Labels ---------\n")
+				logString = logString + color.Yellow("---------- Labels ---------\n").String()
 			} else {
 				logString = logString + "---------- Labels ---------\n"
 			}
 			for i, v := range e.Labels {
 				if internalLogger.Config.Colors {
-					logString = logString + i + " > " + color.GreenString(v) + "\n"
+					logString = logString + i + " > " + color.Green(v).String() + "\n"
 				} else {
 					logString = logString + i + " > " + v + "\n"
 				}
@@ -160,9 +160,9 @@ func (e *InformationConstruct) log() {
 
 		if e.StackTrace != "" {
 			if internalLogger.Config.Colors {
-				logString = logString + color.YellowString("---------- StackTrace ---------\n")
+				logString = logString + color.Yellow("---------- StackTrace ---------\n").String()
 				logString = logString + e.StackTrace + "\n"
-				logString = logString + color.YellowString("---------- JSON Object ----------")
+				logString = logString + color.Yellow("---------- JSON Object ----------").String()
 			} else {
 				logString = logString + "---------- StackTrace ---------\n"
 				logString = logString + e.StackTrace + "\n"
@@ -178,13 +178,13 @@ func (e *InformationConstruct) log() {
 		// e.Message = ""
 	}
 	if internalLogger.Config.Colors {
-		log.Println(color.YellowString(e.LogLevel), color.YellowString(e.LogTag), color.GreenString(e.JSON()))
+		log.Println(color.Yellow(e.LogLevel), color.Yellow(e.LogTag), color.Green(e.JSON()))
 	} else {
 		fmt.Println(e.JSON())
 	}
 	if internalLogger.Config.PrettyPrint {
 		if internalLogger.Config.Colors {
-			fmt.Println(color.MagentaString("=========================="))
+			fmt.Println(color.Magenta("==========================").String())
 		} else {
 			fmt.Println("==========================")
 		}
