@@ -106,6 +106,33 @@ func TestOperationChain(t *testing.T) {
 
 	logger.LogOperationChain(op.ID)
 }
+
+func TestBasic(t *testing.T) {
+	var err error
+	err, GlobalLogger = Init(&LoggingConfig{
+		DefaultLogTag:   "testing-logs",
+		DefaultLogLevel: LogLevelInfo,
+		WithTrace:       true,
+		SimpleTrace:     true,
+		PrettyPrint:     true,
+		Colors:          true,
+		FilesInStack:    true,
+		Type:            "stdout",
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	e := LevelTwoBasic()
+	e.Log()
+}
+func LevelTwoBasic() *InformationConstruct {
+	X := GenericErrorWithMessage(nil, "BOOP!")
+	X.Stack()
+	return X
+}
+
 func TestStdOutShipping(t *testing.T) {
 	var err error
 	err, GlobalLogger = Init(&LoggingConfig{
