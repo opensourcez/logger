@@ -76,7 +76,7 @@ type InformationConstruct struct {
 	// HTTP error code
 	HTTPCode int `json:"HTTPCode,omitempty" xml:"HTTPCode"`
 	// HTTP message
-	HTTPMessage int `json:"HTTPMessage,omitempty" xml:"HTTPMessage"`
+	HTTPMessage string `json:"HTTPMessage,omitempty" xml:"HTTPMessage"`
 	// A custom timestamp
 	Timestamp int64 `json:"Timestamp,omitempty" xml:"Timestamp"`
 	// Indicates if the error is temporary. If a method fails with a temporary error
