@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"log"
 	"runtime/debug"
 	"strings"
 
@@ -27,7 +26,6 @@ func GetSimpleStack(asJSON bool) (string, error) {
 			// currentLine = )
 			fileAndLineSplit = strings.Split(strings.Replace(strings.Split(stackSplit[lineNumberIndex], " ")[0], "\t", "", -1), ":")
 		}
-		log.Println(fileAndLineSplit)
 		if (i % 2) == 1 {
 			splitFunc := strings.Split(v, "(")
 			if len(splitFunc) <= 1 {
