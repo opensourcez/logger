@@ -75,24 +75,25 @@ type InformationConstruct struct {
 	Code string `json:"Code,omitempty" xml:"Code"`
 	// HTTP error code
 	HTTPCode int `json:"HTTPCode,omitempty" xml:"HTTPCode"`
+	// HTTP message
+	HTTPMessage int `json:"HTTPMessage,omitempty" xml:"HTTPMessage"`
 	// A custom timestamp
 	Timestamp int64 `json:"Timestamp,omitempty" xml:"Timestamp"`
 	// Indicates if the error is temporary. If a method fails with a temporary error
 	// it can most of the time be retired within a certain time frame.
 	Temporary bool `json:"Temporary,omitempty" xml:"Temporary"`
-	// How many times has this error been retried
+	// How many times you have retried the cause function of this error
 	Retries int `json:"Retries,omitempty" xml:"Retries"`
 	// The interval of which to retry the method that caused this error.
-	// Seconds, Milliseconds, Microseconds, Nanoseconds.. delers choice.
+	// Seconds, Milliseconds, Microseconds, Nanoseconds.. dealers choice.
 	RetryInterval int `json:"RetryInterval,omitempty" xml:"RetryInterval"`
 	// How often should you retry the method that caused this error.
 	MaxRetries int `json:"MaxRetries,omitempty" xml:"MaxRetries"`
-	// Should this error be returned to the external client. This variable being set to false
-	// indicates this is an internal error and only the code + message will be returned to the user
+	// Should this error be returned to the end-user
 	ReturnToClient bool `json:"-" xml:"-"`
 	// The original error that caused the problem.
 	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
-	// A hint for developers on how to potentially fix thid problem
+	// A hint for developers on how to potentially fix this problem
 	Hint string `json:"Hint,omitempty" xml:"Hint"`
 	// The current stack trace in slice format
 	StackTrace string `json:"-" xml:"-"`
