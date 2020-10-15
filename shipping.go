@@ -73,11 +73,18 @@ func GetHTTPCode(err error) int {
 
 func (e *InformationConstruct) Log() {
 	if e.StackTrace == "" {
-		err := e.Stack()
-		if err != nil {
-			e.StackTrace = "Could not get stacktrace, error:" + err.Error()
-		}
+		e.Stack()
 	}
+	if e.LogTag == "" {
+		e.LogTag = internalLogger.Config.DefaultLogTag
+	}
+	if e.LogLevel == "" {
+		e.LogLevel = internalLogger.Config.DefaultLogLevel
+	}
+	e.Timestamp = time.Now().Unix()
+	e.log()
+}
+func (e *InformationConstruct) LogSkipStack() {
 	if e.LogTag == "" {
 		e.LogTag = internalLogger.Config.DefaultLogTag
 	}

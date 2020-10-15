@@ -44,11 +44,7 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 		}
 	}(object, severity, logTag)
 	// set the stack trace
-	err := object.Stack()
-	if err != nil {
-		object.StackTrace = "Could not get stacktrace, error:" + err.Error()
-	}
-
+	object.Stack()
 	// deconstruct labels and op from the construct
 	labels := object.Labels
 	op := object.Operation

@@ -57,22 +57,22 @@ func GetSimpleStack(asJSON bool) (string, error) {
 	return finalStack, nil
 }
 
-func (object *InformationConstruct) Stack() (err error) {
+func (object *InformationConstruct) Stack() {
 
 	if internalLogger.Config.WithTrace {
 		if internalLogger.Config.SimpleTrace {
 			stacktrace, err := GetSimpleStack(false)
 			if err != nil {
-				return err
+				return
 			}
 			object.StackTrace = stacktrace
-			return nil
+			return
 		}
 		stacktrace := string(debug.Stack())
 		object.StackTrace = stacktrace
-		return nil
+		return
 	}
 
 	// no trace
-	return nil
+	return
 }
