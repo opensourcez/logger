@@ -11,13 +11,16 @@ import (
 )
 
 type GORMLogger struct {
-	Level string
+	Level  string
+	LogTag string
 }
 
 func (g *GORMLogger) Print(value ...interface{}) {
 	if value[0] == "sql" {
 		newErr := GenericError(nil)
 		data := GetSQLString(value...)
+		newErr.LogTag = g.LogTag
+		newErr.LogLevel = g.Level
 		newErr.Query = data[1].(string)
 		newErr.QueryTimingString = data[0].(string)
 		newErr.Message = data[2].(string)
