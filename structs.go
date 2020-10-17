@@ -92,7 +92,7 @@ type InformationConstruct struct {
 	// Should this error be returned to the end-user
 	ReturnToClient bool `json:"-" xml:"-"`
 	// The original error that caused the problem.
-	OriginalError error `json:"OriginalError,omitempty" xml:"OriginalError"`
+	OriginalError error `json:"-" xml:"-"`
 	// A hint for developers on how to potentially fix this problem
 	Hint string `json:"Hint,omitempty" xml:"Hint"`
 	// The current stack trace in slice format
