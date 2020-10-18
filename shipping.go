@@ -75,14 +75,7 @@ func (e *InformationConstruct) Log() {
 	if e.StackTrace == "" {
 		e.Stack()
 	}
-	if e.LogTag == "" {
-		e.LogTag = internalLogger.Config.DefaultLogTag
-	}
-	if e.LogLevel == "" {
-		e.LogLevel = internalLogger.Config.DefaultLogLevel
-	}
-	e.Timestamp = time.Now().Unix()
-	e.log()
+	e.LogSkipStack()
 }
 func (e *InformationConstruct) LogSkipStack() {
 	if e.LogTag == "" {
@@ -92,7 +85,13 @@ func (e *InformationConstruct) LogSkipStack() {
 		e.LogLevel = internalLogger.Config.DefaultLogLevel
 	}
 	e.Timestamp = time.Now().Unix()
-	e.log()
+	if internalLogger.Config.Type == "google" {
+		internalLogger.Client.Log(e)
+	} else if internalLogger.Config.Type == "stdout" {
+		e.log()
+	} else {
+		e.log()
+	}
 }
 
 func (e *InformationConstruct) log() {

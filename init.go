@@ -47,6 +47,9 @@ func Init(config *LoggingConfig) (err error, l *Logger) {
 		client := GoogleClient{}
 		err = client.new(config)
 		l.Client = &client
+		if err != nil {
+			panic(err)
+		}
 		break
 	case "stdout":
 		client := StdClient{}

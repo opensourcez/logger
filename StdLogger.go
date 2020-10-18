@@ -1,5 +1,7 @@
 package logger
 
+import "log"
+
 func (g *StdClient) new(config *LoggingConfig) (err error) {
 
 	g.Loggers = make(map[string]string)
@@ -23,4 +25,8 @@ func (g *StdClient) new(config *LoggingConfig) (err error) {
 
 func (g *StdClient) close() {
 	// no op
+}
+
+func (s *StdClient) Log(e *InformationConstruct) {
+	log.Println("NOT IMPLEMENTED: use .Log() on the information construct it self")
 }

@@ -3,11 +3,13 @@ package logger
 import (
 	"context"
 	"log"
+	"runtime/debug"
 	"time"
 
 	"cloud.google.com/go/logging"
 	gclogging "cloud.google.com/go/logging"
 	"github.com/google/uuid"
+	option "google.golang.org/api/option"
 	logpb "google.golang.org/genproto/googleapis/logging/v2"
 )
 
@@ -15,12 +17,13 @@ func (g *GoogleClient) new(config *LoggingConfig) (err error) {
 
 	// Init the client
 	ctx := context.Background()
-	newClient, err := logging.NewClient(ctx, config.ProjectID)
+	newClient, err := logging.NewClient(ctx, config.ProjectID, option.WithCredentialsFile(config.CredentialsPath))
 	if err != nil {
 		return err
 	}
 
 	g.Loggers = make(map[string]*gclogging.Logger)
+	g.Loggers[config.DefaultLogTag] = newClient.Logger(config.DefaultLogTag)
 	for _, v := range config.Logs {
 		g.Loggers[v] = newClient.Logger(v)
 	}
@@ -30,21 +33,21 @@ func (g *GoogleClient) new(config *LoggingConfig) (err error) {
 	return nil
 }
 
-func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag string) {
+func (g *GoogleClient) Log(object *InformationConstruct) {
 
 	defer func(object *InformationConstruct, severity string, logTag string) {
 		if r := recover(); r != nil {
-			if object.Operation.ID != "" {
-				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
-			} else {
-				object.Operation = Operation{ID: uuid.New().String()}
-				log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
-			}
-			object.log()
+			// if object.Operation.ID != "" {
+			// 	log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
+			// } else {
+			// 	object.Operation = Operation{ID: uuid.New().String()}
+			// 	log.Println("GOOGLE CLOUD LOGGER FAILED, OP ID:", object.Operation.ID, "\n", r)
+			// }
+			// object.log()
+			log.Println(string(debug.Stack()), r)
 		}
-	}(object, severity, logTag)
+	}(object, object.LogLevel, object.LogTag)
 	// set the stack trace
-	object.Stack()
 	// deconstruct labels and op from the construct
 	labels := object.Labels
 	op := object.Operation
@@ -52,16 +55,16 @@ func (g *GoogleClient) log(object *InformationConstruct, severity string, logTag
 	cleanInformationConstruct(object)
 
 	if object.LogTag == "" {
-		object.LogTag = severity
+		object.LogTag = internalLogger.Config.DefaultLogTag
 	}
 	// ship
-	g.Loggers[logTag].Log(logging.Entry{
+	g.Loggers[object.LogTag].Log(logging.Entry{
 		InsertID: uuid.New().String(),
 		//InsertID:  "sadasdasd",
 		Timestamp: time.Now(),
 		Labels:    labels,
 		Payload:   object,
-		Severity:  getSeverity(object.LogTag),
+		Severity:  getSeverity(object.LogLevel),
 		Operation: &logpb.LogEntryOperation{
 			Id:       op.ID,
 			Producer: op.Producer,

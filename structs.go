@@ -15,6 +15,7 @@ type Logger struct {
 // LoggingClient ...
 type LoggingClient interface {
 	new(config *LoggingConfig) error
+	Log(*InformationConstruct)
 	close()
 }
 
@@ -56,6 +57,8 @@ type LoggingConfig struct {
 
 	// This field is only for google cloud logging, which is still in development
 	Logs []string
+	// Path to the credentials file used for google cloud logging
+	CredentialsPath string
 }
 
 // InformationConstruct ...

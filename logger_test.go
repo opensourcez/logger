@@ -2,52 +2,54 @@ package logger
 
 import (
 	"testing"
+	"time"
 )
 
-// func CloudShipping(t *testing.T) {
-// 	err, logger := Init(&LoggingConfig{
-// 		ProjectID:     "heroic-truck-168212",
-// 		DefaultLogTag: "general",
-// 		// Logs:          []string{"transaction", "error", "activity"},
-// 		WithTrace:   true,
-// 		SimpleTrace: true,
-// 		PrettyPrint: true,
-// 		Type:        "google",
-// 	})
+func TestCloudShipping(t *testing.T) {
+	err, _ := Init(&LoggingConfig{
+		ProjectID:     "starlit-tine-292423",
+		DefaultLogTag: "general",
+		// Logs:          []string{"transaction", "error", "activity"},
+		WithTrace:       true,
+		SimpleTrace:     true,
+		PrettyPrint:     true,
+		Type:            "google",
+		CredentialsPath: "loggingkey.json",
+	})
 
-// 	//log.Println(logger)
+	//log.Println(logger)
 
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	if err != nil {
+		panic(err)
+	}
 
-// 	op := Operation{
-// 		Producer: "GET: /some/path/to/awesomeness",
-// 		ID:       "123123jb123b12",
-// 		First:    true,
-// 		Last:     false,
-// 	}
-// 	labels := make(map[string]string)
-// 	labels["CUSTOMER"] = "Google"
-// 	labels["SHORTCODE"] = "Goo"
-// 	labels["PATH"] = "/some/path/to/awesomeness"
-// 	labels["RANDOM"] = "whatDoYouNeedHere?"
+	op := Operation{
+		Producer: "GET: /some/path/to/awesomeness",
+		ID:       "1337",
+		First:    true,
+		Last:     false,
+	}
+	labels := make(map[string]string)
+	labels["CUSTOMER"] = "Google"
+	labels["SHORTCODE"] = "Goo"
+	labels["PATH"] = "/some/path/to/awesomeness"
+	labels["RANDOM"] = "whatDoYouNeedHere?"
 
-// 	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
-// 	newError.Operation = op
-// 	newError.Labels = labels
+	newError := GenericErrorWithMessage(nil, "A very descriptive message telling others what went wrong")
+	newError.Operation = op
+	newError.Labels = labels
 
-// 	logger.ERROR(*newError, "transaction")
+	newError.Log()
 
-// 	newError2 := BadEmailOrPassword(nil)
-// 	op.First = false
-// 	op.Last = true
-// 	newError2.Operation = op
-// 	newError2.Labels = labels
+	newError2 := BadEmailOrPassword(nil)
+	op.First = false
+	op.Last = true
+	newError2.Operation = op
+	newError2.Labels = labels
 
-// 	logger.ERROR(*newError2, "transaction")
-// 	time.Sleep(time.Second * 5)
-// }
+	newError2.Log()
+	time.Sleep(time.Second * 5)
+}
 
 func TestOperationChain(t *testing.T) {
 	err, logger := Init(&LoggingConfig{
