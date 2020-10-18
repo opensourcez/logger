@@ -199,6 +199,12 @@ func (e *InformationConstruct) log() {
 
 }
 func (e *InformationConstruct) AddToChain() {
+	if e.StackTrace == "" {
+		e.Stack()
+	}
+	internalLogger.Chain[e.Operation.ID] = append(internalLogger.Chain[e.Operation.ID], *e)
+}
+func (e *InformationConstruct) AddToChainSkipStack() {
 	internalLogger.Chain[e.Operation.ID] = append(internalLogger.Chain[e.Operation.ID], *e)
 }
 
@@ -208,7 +214,7 @@ func (l *Logger) LogOperationChain(id string) {
 	ChainMutex.Lock()
 	defer ChainMutex.Unlock()
 	for _, v := range l.Chain[id] {
-		v.Log()
+		v.LogSkipStack()
 	}
 	delete(l.Chain, id)
 }

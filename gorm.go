@@ -18,12 +18,14 @@ type GORMLogger struct {
 func (g *GORMLogger) Print(value ...interface{}) {
 	if value[0] == "sql" {
 		newErr := GenericError(nil)
-		data := GetSQLString(value...)
+		newErr.Labels = make(map[string]string)
+		data := GetSQLString(newErr.Labels, value...)
 		newErr.LogTag = g.LogTag
 		newErr.LogLevel = g.Level
 		newErr.Query = data[1].(string)
 		newErr.QueryTimingString = data[0].(string)
 		newErr.Message = data[2].(string)
+		newErr.Hint = value[3].(string)
 		newErr.Log()
 	}
 
@@ -36,12 +38,12 @@ func isPrintable(s string) bool {
 	}
 	return true
 }
-func GetSQLString(values ...interface{}) (messages []interface{}) {
+func GetSQLString(labels map[string]string, values ...interface{}) (messages []interface{}) {
 	if len(values) > 1 {
 		var (
-			sql             string
-			formattedValues []string
-			level           = values[0]
+			sql string
+			// formattedValues []string
+			level = values[0]
 		)
 
 		messages = []interface{}{}
@@ -51,57 +53,66 @@ func GetSQLString(values ...interface{}) (messages []interface{}) {
 			messages = append(messages, fmt.Sprintf("%.2fms", float64(values[2].(time.Duration).Nanoseconds()/1e4)/100.0))
 			// sql
 
-			for _, value := range values[4].([]interface{}) {
+			for index, value := range values[4].([]interface{}) {
 				indirectValue := reflect.Indirect(reflect.ValueOf(value))
 				if indirectValue.IsValid() {
 					value = indirectValue.Interface()
 					if t, ok := value.(time.Time); ok {
 						if t.IsZero() {
-							formattedValues = append(formattedValues, fmt.Sprintf("'%v'", "0000-00-00 00:00:00"))
+							labels[strconv.Itoa(index)] = fmt.Sprintf("'%v'", "0000-00-00 00:00:00")
+							// formattedValues = append(formattedValues, fmt.Sprintf("'%v'", "0000-00-00 00:00:00"))
 						} else {
-							formattedValues = append(formattedValues, fmt.Sprintf("'%v'", t.Format("2006-01-02 15:04:05")))
+							labels[strconv.Itoa(index)] = fmt.Sprintf("'%v'", t.Format("2006-01-02 15:04:05"))
+							// formattedValues = append(formattedValues, fmt.Sprintf("'%v'", t.Format("2006-01-02 15:04:05")))
 						}
 					} else if b, ok := value.([]byte); ok {
 						if str := string(b); isPrintable(str) {
-							formattedValues = append(formattedValues, fmt.Sprintf("'%v'", str))
+							labels[strconv.Itoa(index)] = str
+							// formattedValues = append(formattedValues, fmt.Sprintf("'%v'", str))
 						} else {
-							formattedValues = append(formattedValues, "'<binary>'")
+							labels[strconv.Itoa(index)] = "<binary>"
+							// formattedValues = append(formattedValues, "'<binary>'")
 						}
 					} else if r, ok := value.(driver.Valuer); ok {
 						if value, err := r.Value(); err == nil && value != nil {
-							formattedValues = append(formattedValues, fmt.Sprintf("'%v'", value))
+							labels[strconv.Itoa(index)] = fmt.Sprintf("'%v'", value)
+							// formattedValues = append(formattedValues, fmt.Sprintf("'%v'", value))
 						} else {
-							formattedValues = append(formattedValues, "NULL")
+							labels[strconv.Itoa(index)] = "NULL"
+							// formattedValues = append(formattedValues, "NULL")
 						}
 					} else {
 						switch value.(type) {
 						case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
-							formattedValues = append(formattedValues, fmt.Sprintf("%v", value))
+							// formattedValues = append(formattedValues, fmt.Sprintf("%v", value))
+							labels[strconv.Itoa(index)] = fmt.Sprintf("'%v'", value)
 						default:
-							formattedValues = append(formattedValues, fmt.Sprintf("'%v'", value))
+							labels[strconv.Itoa(index)] = fmt.Sprintf("'%v'", value)
+							// formattedValues = append(formattedValues, fmt.Sprintf("'%v'", value))
 						}
 					}
 				} else {
-					formattedValues = append(formattedValues, "NULL")
+					labels[strconv.Itoa(index)] = "NULL"
+					// formattedValues = append(formattedValues, "NULL")
 				}
 			}
 
-			// differentiate between $n placeholders or else treat like ?
-			if numericPlaceHolderRegexp.MatchString(values[3].(string)) {
-				sql = values[3].(string)
-				for index, value := range formattedValues {
-					placeholder := fmt.Sprintf(`\$%d([^\d]|$)`, index+1)
-					sql = regexp.MustCompile(placeholder).ReplaceAllString(sql, value+"$1")
-				}
-			} else {
-				formattedValuesLength := len(formattedValues)
-				for index, value := range sqlRegexp.Split(values[3].(string), -1) {
-					sql += value
-					if index < formattedValuesLength {
-						sql += formattedValues[index]
-					}
-				}
-			}
+			// // differentiate between $n placeholders or else treat like ?
+			// if numericPlaceHolderRegexp.MatchString(values[3].(string)) {
+			// 	sql = values[3].(string)
+			// 	for index, value := range labels {
+			// 		placeholder := fmt.Sprintf(`\$%d([^\d]|$)`, index+1)
+			// 		sql = regexp.MustCompile(placeholder).ReplaceAllString(sql, value+"$1")
+			// 	}
+			// } else {
+			// 	formattedValuesLength := len(labels)
+			// 	for index, value := range sqlRegexp.Split(values[3].(string), -1) {
+			// 		sql += value
+			// 		if index < formattedValuesLength {
+			// 			sql += formattedValues[index]
+			// 		}
+			// 	}
+			// }
 
 			messages = append(messages, sql)
 			messages = append(messages, fmt.Sprintf("%v ", strconv.FormatInt(values[5].(int64), 10)+" rows affected or returned"))
